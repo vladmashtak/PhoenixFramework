@@ -9,6 +9,7 @@ import java.util.Map;
 
 /**
  * @author Oleg Marchenko
+ * @see org.phoenixframework.core.executor.ReadOnlyResultSet
  */
 
 public class CachedResultSet implements ReadOnlyResultSet {
@@ -16,7 +17,6 @@ public class CachedResultSet implements ReadOnlyResultSet {
     private static final int BEFORE_FIRST_ROW_INDEX = -1;
 
     private final Map<String, List<Object>> cachedResultByLabel;
-    private final Map<Integer, List<Object>> cachedResultByIndex;
     private int cursorIndex = BEFORE_FIRST_ROW_INDEX;
     private int rowCount;
 
@@ -25,16 +25,15 @@ public class CachedResultSet implements ReadOnlyResultSet {
         int columnCount = metaData.getColumnCount() + 1;
 
         cachedResultByLabel = new HashMap<>(columnCount, 1.0F);
-        cachedResultByIndex = new HashMap<>(columnCount, 1.0F);
         for (int i = 1; i < columnCount; i++) {
-            List<Object> rowData = new ArrayList<>(DEFAULT_ROWS_CAPACITY);
-            cachedResultByLabel.put(metaData.getColumnName(i).toLowerCase(), rowData);
-            cachedResultByIndex.put(i, rowData);
+            String columnLabel = metaData.getColumnName(i).toLowerCase();
+            cachedResultByLabel.put(columnLabel, new ArrayList<>(DEFAULT_ROWS_CAPACITY));
         }
 
         while (result.next()) {
             for (int i = 1; i < columnCount; i++) {
-                cachedResultByLabel.get(metaData.getColumnName(i).toLowerCase()).add(result.getObject(i));
+                String columnLabel = metaData.getColumnName(i).toLowerCase();
+                cachedResultByLabel.get(columnLabel).add(result.getObject(i));
             }
             rowCount++;
         }
@@ -108,18 +107,8 @@ public class CachedResultSet implements ReadOnlyResultSet {
     }
 
     @Override
-    public boolean getBoolean(int columnIndex) {
-        return (Boolean) getObject(columnIndex);
-    }
-
-    @Override
     public Byte getByte(String columnLabel) {
         return (Byte) getObject(columnLabel);
-    }
-
-    @Override
-    public byte getByte(int columnIndex) {
-        return (Byte) getObject(columnIndex);
     }
 
     @Override
@@ -128,18 +117,8 @@ public class CachedResultSet implements ReadOnlyResultSet {
     }
 
     @Override
-    public short getShort(int columnIndex) {
-        return (Short) getObject(columnIndex);
-    }
-
-    @Override
     public Integer getInt(String columnLabel) {
         return (Integer) getObject(columnLabel);
-    }
-
-    @Override
-    public int getInt(int columnIndex) {
-        return (Integer) getObject(columnIndex);
     }
 
     @Override
@@ -148,18 +127,8 @@ public class CachedResultSet implements ReadOnlyResultSet {
     }
 
     @Override
-    public long getLong(int columnIndex) {
-        return (Long) getObject(columnIndex);
-    }
-
-    @Override
     public Float getFloat(String columnLabel) {
         return (Float) getObject(columnLabel);
-    }
-
-    @Override
-    public float getFloat(int columnIndex) {
-        return (Float) getObject(columnIndex);
     }
 
     @Override
@@ -168,18 +137,8 @@ public class CachedResultSet implements ReadOnlyResultSet {
     }
 
     @Override
-    public double getDouble(int columnIndex) {
-        return (Double) getObject(columnIndex);
-    }
-
-    @Override
     public String getString(String columnLabel) {
         return (String) getObject(columnLabel);
-    }
-
-    @Override
-    public String getString(int columnIndex) {
-        return (String) getObject(columnIndex);
     }
 
     @Override
@@ -189,19 +148,8 @@ public class CachedResultSet implements ReadOnlyResultSet {
     }
 
     @Override
-    public Object getObject(int columnIndex) {
-        List<Object> columnRows = cachedResultByIndex.get(columnIndex);
-        return columnRows == null ? null : columnRows.get(cursorIndex);
-    }
-
-    @Override
     public Time getTime(String columnLabel) {
         return (Time) getObject(columnLabel);
-    }
-
-    @Override
-    public Time getTime(int columnIndex) {
-        return (Time) getObject(columnIndex);
     }
 
     @Override
@@ -210,27 +158,12 @@ public class CachedResultSet implements ReadOnlyResultSet {
     }
 
     @Override
-    public Timestamp getTimestamp(int columnIndex) {
-        return (Timestamp) getObject(columnIndex);
-    }
-
-    @Override
     public Date getDate(String columnLabel) {
         return (Date) getObject(columnLabel);
     }
 
     @Override
-    public Date getDate(int columnIndex) {
-        return (Date) getObject(columnIndex);
-    }
-
-    @Override
     public BigDecimal getBigDecimal(String columnLabel) {
         return (BigDecimal) getObject(columnLabel);
-    }
-
-    @Override
-    public BigDecimal getBigDecimal(int columnIndex) {
-        return (BigDecimal) getObject(columnIndex);
     }
 }

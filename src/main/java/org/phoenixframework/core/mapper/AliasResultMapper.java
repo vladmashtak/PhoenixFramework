@@ -1,15 +1,13 @@
 package org.phoenixframework.core.mapper;
 
 import org.phoenixframework.core.annotation.FromColumn;
+import org.phoenixframework.core.annotation.Transient;
 import org.phoenixframework.core.executor.ReadOnlyResultSet;
+import org.phoenixframework.core.provider.ResultSetMethodProvider;
 import org.phoenixframework.core.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.sql.Date;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -19,82 +17,77 @@ import java.util.Map;
  */
 
 public class AliasResultMapper<T> extends CustomResultMapper<T> {
-    private static final Map<Class<?>, Method> FIELD_TYPE_TO_RESULT_SET_METHOD = new HashMap<>();
-    static {
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(boolean.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getBoolean", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(byte.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getByte", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(short.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getShort", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(int.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getInt", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(long.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getLong", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(float.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getFloat", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(double.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getDouble", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(Boolean.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getBoolean", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(Byte.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getByte", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(Short.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getShort", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(Integer.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getInt", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(Long.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getLong", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(Float.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getFloat", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(Double.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getDouble", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(Object.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getObject", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(String.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getString", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(Date.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getDate", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(Time.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getTime", String.class));
-        FIELD_TYPE_TO_RESULT_SET_METHOD.put(Timestamp.class, ReflectionUtils.getMethodByName(ReadOnlyResultSet.class, "getTimestamp", String.class));
-    }
 
     private final Class<T> classType;
-    private final Map<FieldWrapper, Method> fieldValueResolver;
+    private final Map<FieldWrapper, Method> fieldValueFromMethodResolver;
 
     public AliasResultMapper(Class<T> classType) {
         this.classType = classType;
 
-        Field[] fields = classType.getDeclaredFields();
-        fieldValueResolver = new LinkedHashMap<>(fields.length + 1, 1.0F);
-        for (Field field: fields) {
-            Class<?> fieldType = field.getType();
-            Method method = FIELD_TYPE_TO_RESULT_SET_METHOD.get(fieldType);
-            if (method == null) {
-                throw new IllegalStateException("Cannot resolve method by field \"" + field.getName() + "\" with type \"" + fieldType.getSimpleName() + "\"");
-            }
-            fieldValueResolver.put(FieldWrapper.create(field), method);
-        }
+        Field[] fields = classType.getFields();
+        this.fieldValueFromMethodResolver = new LinkedHashMap<>(fields.length + 1, 1.0F);
+        analyzeClassFields(fields);
     }
 
     @Override
     protected T map(ReadOnlyResultSet result) {
         T object = ReflectionUtils.newInstance(classType);
-        for (FieldWrapper fieldWrapper: fieldValueResolver.keySet()) {
-            Method method = fieldValueResolver.get(fieldWrapper);
-            Object value = ReflectionUtils.invokeMethod(result, method, fieldWrapper.getColumnName());
+        for (Map.Entry<FieldWrapper, Method> fieldValueFromMethod: fieldValueFromMethodResolver.entrySet()) {
+            FieldWrapper fieldWrapper = fieldValueFromMethod.getKey();
+            Method method = fieldValueFromMethod.getValue();
+            Object value = ReflectionUtils.invokeMethod(result, method, fieldWrapper.getColumnLabel());
             ReflectionUtils.setValueToField(object, fieldWrapper.getField(), value);
         }
         return object;
     }
 
-    private static class FieldWrapper {
-        private final Field field;
-        private final String columnName;
-
-        private FieldWrapper(Field field) {
-            this.field = field;
-            if (field.isAnnotationPresent(FromColumn.class)) {
-                FromColumn fromColumn = field.getAnnotation(FromColumn.class);
-                this.columnName = fromColumn.value();
-            } else {
-                this.columnName = field.getName();
+    private void analyzeClassFields(Field[] fields) {
+        for (Field field: fields) {
+            if (!field.isAnnotationPresent(Transient.class)) {
+                String columnLabel = field.getName();
+                if (field.isAnnotationPresent(FromColumn.class)) {
+                    FromColumn fromColumn = field.getAnnotation(FromColumn.class);
+                    columnLabel = fromColumn.value();
+                }
+                Method method = ResultSetMethodProvider.getMethod(field.getType());
+                fieldValueFromMethodResolver.put(new FieldWrapper(field, columnLabel), method);
             }
+        }
+    }
+
+    private static class FieldWrapper {
+
+        private final Field field;
+        private final String columnLabel;
+
+        public FieldWrapper(Field field, String columnLabel) {
+            this.field = field;
+            this.columnLabel = columnLabel;
         }
 
         public Field getField() {
             return field;
         }
 
-        public String getColumnName() {
-            return columnName;
+        public String getColumnLabel() {
+            return columnLabel;
         }
 
-        public static FieldWrapper create(Field field) {
-            return new FieldWrapper(field);
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            final FieldWrapper that = (FieldWrapper) o;
+            return field.equals(that.field) && columnLabel.equals(that.columnLabel);
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = field.hashCode();
+            result = 31 * result + columnLabel.hashCode();
+            return result;
         }
     }
 }

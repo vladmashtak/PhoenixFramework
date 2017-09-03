@@ -10,6 +10,7 @@ import java.util.List;
  * @param <T> the type of mapping object
  *
  * @author Oleg Marchenko
+ * @see org.phoenixframework.core.executor.CachedResultSet
  */
 
 public interface ResultMapper<T> {

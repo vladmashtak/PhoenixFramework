@@ -36,7 +36,16 @@ public class ReflectionUtils {
         try {
             field.set(object, value);
         } catch (IllegalAccessException e) {
-            throw new IllegalStateException("Cannot access field \"" + object.getClass().getSimpleName() + "." + field.getName() + " = " + value + "\"", e);
+            throw new IllegalStateException("Cannot access to field \"" + object.getClass().getSimpleName() + "." + field.getName() + " = " + value + "\"", e);
+        }
+    }
+
+    public static Object getValueFromField(Object object, Field field) {
+        field.setAccessible(true);
+        try {
+            return field.get(object);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Cannot access to field \"" + object.getClass().getSimpleName() + "." + field.getName() + "\"", e);
         }
     }
 

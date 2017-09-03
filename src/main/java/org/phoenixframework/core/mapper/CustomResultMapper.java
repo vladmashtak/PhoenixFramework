@@ -8,8 +8,13 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * The <code>CustomResultMapper</code> allows to implement the logic of custom mapping
+ * in method {@link #map(ReadOnlyResultSet)} for data object.
+ *
  * @author Oleg Marchenko
  * @see org.phoenixframework.core.mapper.ResultMapper
+ * @see org.phoenixframework.core.executor.ReadOnlyResultSet
+ * @see org.phoenixframework.core.executor.CachedResultSet
  */
 
 public abstract class CustomResultMapper<T> implements ResultMapper<T> {
@@ -35,10 +40,10 @@ public abstract class CustomResultMapper<T> implements ResultMapper<T> {
     }
 
     /**
-     * Implementation of mapping object method.
+     * Implementation of custom mapping object method.
      *
      * @param result the result set from database
-     * @return mapping object
+     * @return mapping data object
      */
     protected abstract T map(ReadOnlyResultSet result);
 }

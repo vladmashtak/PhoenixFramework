@@ -3,42 +3,55 @@ package org.phoenixframework.core.mapper;
 import org.phoenixframework.core.annotation.FromColumn;
 import org.phoenixframework.core.annotation.Transient;
 import org.phoenixframework.core.executor.ReadOnlyResultSet;
-import org.phoenixframework.core.provider.ResultSetMethodProvider;
 import org.phoenixframework.core.util.ReflectionUtils;
+import org.phoenixframework.core.util.ResultSetMethodResolver;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Oleg Marchenko
  * @see org.phoenixframework.core.mapper.CustomResultMapper
+ * @see org.phoenixframework.core.mapper.DataTransformer
  */
 
-public class AliasResultMapper<T> extends CustomResultMapper<T> {
+public class AliasResultMapper<T> extends CustomResultMapper<T> implements DataTransformer<T> {
 
     private final Class<T> classType;
-    private final Map<FieldWrapper, Method> fieldValueFromMethodResolver;
+    private final Map<FieldWrapper, Method> fieldWrapperToMethodResolver;
 
     public AliasResultMapper(Class<T> classType) {
         this.classType = classType;
 
-        Field[] fields = classType.getFields();
-        this.fieldValueFromMethodResolver = new LinkedHashMap<>(fields.length + 1, 1.0F);
+        Field[] fields = classType.getDeclaredFields();
+        fieldWrapperToMethodResolver = new LinkedHashMap<>(fields.length + 1, 1.0F);
         analyzeClassFields(fields);
     }
 
     @Override
     protected T map(ReadOnlyResultSet result) {
         T object = ReflectionUtils.newInstance(classType);
-        for (Map.Entry<FieldWrapper, Method> fieldValueFromMethod: fieldValueFromMethodResolver.entrySet()) {
+        for (Map.Entry<FieldWrapper, Method> fieldValueFromMethod: fieldWrapperToMethodResolver.entrySet()) {
             FieldWrapper fieldWrapper = fieldValueFromMethod.getKey();
             Method method = fieldValueFromMethod.getValue();
             Object value = ReflectionUtils.invokeMethod(result, method, fieldWrapper.getColumnLabel());
             ReflectionUtils.setValueToField(object, fieldWrapper.getField(), value);
         }
         return object;
+    }
+
+    @Override
+    public Map<String, Object> toNamedValues(T object) {
+        Set<FieldWrapper> classFieldWrappers = fieldWrapperToMethodResolver.keySet();
+        Map<String, Object> namedValues = new LinkedHashMap<>(classFieldWrappers.size() + 1, 1.0F);
+        for (FieldWrapper fieldWrapper: classFieldWrappers) {
+            Object fieldValue = ReflectionUtils.getValueFromField(object, fieldWrapper.getField());
+            namedValues.put(fieldWrapper.getColumnLabel(), fieldValue);
+        }
+        return namedValues;
     }
 
     private void analyzeClassFields(Field[] fields) {
@@ -49,8 +62,8 @@ public class AliasResultMapper<T> extends CustomResultMapper<T> {
                     FromColumn fromColumn = field.getAnnotation(FromColumn.class);
                     columnLabel = fromColumn.value();
                 }
-                Method method = ResultSetMethodProvider.getMethod(field.getType());
-                fieldValueFromMethodResolver.put(new FieldWrapper(field, columnLabel), method);
+                Method method = ResultSetMethodResolver.getMethod(field.getType());
+                fieldWrapperToMethodResolver.put(new FieldWrapper(field, columnLabel), method);
             }
         }
     }

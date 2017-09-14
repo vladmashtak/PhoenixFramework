@@ -8,37 +8,51 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Caches data from the result set providing the same interaction interface.
+ *
  * @author Oleg Marchenko
  * @see org.phoenixframework.core.executor.ReadOnlyResultSet
  */
 
 public class CachedResultSet implements ReadOnlyResultSet {
-    private static final int DEFAULT_ROWS_CAPACITY = 64;
-    private static final int BEFORE_FIRST_ROW_INDEX = -1;
+    private static int DEFAULT_ROWS_CAPACITY = 64;
+    private static int BEFORE_FIRST_ROW_INDEX = -1;
 
-    private final Map<String, List<Object>> cachedResultByLabel;
+    private final List<List<Object>> cachedResultByIndex;
+    private final Map<String, Integer> columnLabelToIndexRegistry;
     private int cursorIndex = BEFORE_FIRST_ROW_INDEX;
     private int rowCount;
 
+    /**
+     * @param result inbound result set
+     * @throws SQLException if a database access error occurs
+     */
     public CachedResultSet(ResultSet result) throws SQLException {
         ResultSetMetaData metaData = result.getMetaData();
-        int columnCount = metaData.getColumnCount() + 1;
+        int columnCount = metaData.getColumnCount();
 
-        cachedResultByLabel = new HashMap<>(columnCount, 1.0F);
-        for (int i = 1; i < columnCount; i++) {
+        cachedResultByIndex = new ArrayList<>(columnCount);
+        columnLabelToIndexRegistry = new HashMap<>(columnCount + 1, 1.0F);
+        for (int i = 1; i <= columnCount; i++) {
+            cachedResultByIndex.add(new ArrayList<>(DEFAULT_ROWS_CAPACITY));
+                    
             String columnLabel = metaData.getColumnName(i).toLowerCase();
-            cachedResultByLabel.put(columnLabel, new ArrayList<>(DEFAULT_ROWS_CAPACITY));
+            columnLabelToIndexRegistry.put(columnLabel, i - 1);
         }
-
+        
         while (result.next()) {
-            for (int i = 1; i < columnCount; i++) {
-                String columnLabel = metaData.getColumnName(i).toLowerCase();
-                cachedResultByLabel.get(columnLabel).add(result.getObject(i));
+            for (int i = 1; i <= columnCount; i++) {
+                cachedResultByIndex.get(i - 1).add(result.getObject(i));
             }
             rowCount++;
         }
     }
 
+    /**
+     * Moves the cursor to the previous row and returns <tt>true</tt> if the cursor after the first row.
+     *
+     * @return <tt>true</tt> if the cursor after the first row
+     */
     public boolean previous() {
         --cursorIndex;
         if (cursorIndex < BEFORE_FIRST_ROW_INDEX) {
@@ -47,6 +61,11 @@ public class CachedResultSet implements ReadOnlyResultSet {
         return cursorIndex > BEFORE_FIRST_ROW_INDEX;
     }
 
+    /**
+     * Moves the cursor to the next row and returns <tt>true</tt> if the cursor before the last row.
+     *
+     * @return <tt>true</tt> if the cursor before the last row
+     */
     public boolean next() {
         ++cursorIndex;
         if (cursorIndex > rowCount) {
@@ -55,50 +74,171 @@ public class CachedResultSet implements ReadOnlyResultSet {
         return cursorIndex < rowCount;
     }
 
+    /**
+     * Returns <tt>true</tt> if this result set contains no rows.
+     *
+     * @return <tt>true</tt> if this result set contains no rows
+     */
     public boolean isEmpty() {
         return rowCount == 0;
     }
 
+    /**
+     * Returns <tt>true</tt> if the cursor is before the first row.
+     *
+     * @return <tt>true</tt> if the cursor is before the first row
+     */
     public boolean isBeforeFirst() {
         return cursorIndex == BEFORE_FIRST_ROW_INDEX;
     }
 
+    /**
+     * Returns <tt>true</tt> if the cursor is after the last row.
+     *
+     * @return <tt>true</tt> if the cursor is after the last row
+     */
     public boolean isAfterLast() {
         return cursorIndex == rowCount;
     }
 
+    /**
+     * Returns <tt>true</tt> if the cursor is on the first row.
+     *
+     * @return <tt>true</tt> if the cursor is on the first row
+     */
     public boolean isFirst() {
         return cursorIndex == 0;
     }
 
+    /**
+     * Returns <tt>true</tt> if the cursor is on the last row.
+     *
+     * @return <tt>true</tt> if the cursor is on the last row
+     */
     public boolean isLast() {
         return cursorIndex == rowCount - 1;
     }
 
+    /**
+     * Moves the cursor to the front of result set, just before the first row.
+     */
     public void beforeFirst() {
         cursorIndex = BEFORE_FIRST_ROW_INDEX;
     }
 
+    /**
+     * Moves the cursor to the back of result set, just after the last row.
+     */
     public void afterLast() {
         cursorIndex = rowCount;
     }
 
+    /**
+     * Moves the cursor to the first row and returns <tt>true</tt> if the cursor is on a valid row.
+     *
+     * @return <tt>true</tt> if the cursor is on a valid row
+     */
     public boolean first() {
         cursorIndex = 0;
         return cursorIndex < rowCount;
     }
 
+    /**
+     * Moves the cursor to the last row and returns <tt>true</tt> if the cursor is on a valid row.
+     *
+     * @return <tt>true</tt> if the cursor is on a valid row
+     */
     public boolean last() {
         cursorIndex = rowCount - 1;
         return cursorIndex < rowCount;
     }
 
+    /**
+     * Returns the current row number. The first row is number 1 and las row is number {@link #getRowCount()} - 1.
+     *
+     * @return the current row number
+     */
     public int getRow() {
         return cursorIndex;
     }
 
+    /**
+     * Returns the number of rows in this result set.
+     *
+     * @return the number of rows in this result set
+     */
     public int getRowCount() {
         return rowCount;
+    }
+
+    @Override
+    public boolean getBoolean(int columnIndex) {
+        return (Boolean) getObject(columnIndex);
+    }
+
+    @Override
+    public byte getByte(int columnIndex) {
+        return (Byte) getObject(columnIndex);
+    }
+
+    @Override
+    public short getShort(int columnIndex) {
+        return (Short) getObject(columnIndex);
+    }
+
+    @Override
+    public int getInt(int columnIndex) {
+        return (Integer) getObject(columnIndex);
+    }
+
+    @Override
+    public long getLong(int columnIndex) {
+        return (Long) getObject(columnIndex);
+    }
+
+    @Override
+    public float getFloat(int columnIndex) {
+        return (Float) getObject(columnIndex);
+    }
+
+    @Override
+    public double getDouble(int columnIndex) {
+        return (Double) getObject(columnIndex);
+    }
+
+    @Override
+    public String getString(int columnIndex) {
+        return (String) getObject(columnIndex);
+    }
+
+    @Override
+    public Object getObject(int columnIndex) {
+        return cachedResultByIndex.get(columnIndex - 1).get(cursorIndex);
+    }
+
+    @Override
+    public Time getTime(int columnIndex) {
+        return (Time) getObject(columnIndex);
+    }
+
+    @Override
+    public Timestamp getTimestamp(int columnIndex) {
+        return (Timestamp) getObject(columnIndex);
+    }
+
+    @Override
+    public Date getDate(int columnIndex) {
+        return (Date) getObject(columnIndex);
+    }
+
+    @Override
+    public BigDecimal getBigDecimal(int columnIndex) {
+        return (BigDecimal) getObject(columnIndex);
+    }
+
+    @Override
+    public byte[] getBytes(final int columnIndex) {
+        return (byte[]) getObject(columnIndex);
     }
 
     @Override
@@ -143,8 +283,12 @@ public class CachedResultSet implements ReadOnlyResultSet {
 
     @Override
     public Object getObject(String columnLabel) {
-        List<Object> columnRows = cachedResultByLabel.get(columnLabel.toLowerCase());
-        return columnRows == null ? null : columnRows.get(cursorIndex);
+        Integer columnIndex = columnLabelToIndexRegistry.get(columnLabel.toLowerCase());
+        if (columnIndex == null)
+        {
+            return null;
+        }
+        return getObject(columnIndex + 1);
     }
 
     @Override
@@ -165,5 +309,10 @@ public class CachedResultSet implements ReadOnlyResultSet {
     @Override
     public BigDecimal getBigDecimal(String columnLabel) {
         return (BigDecimal) getObject(columnLabel);
+    }
+
+    @Override
+    public byte[] getBytes(final String columnLabel) {
+        return (byte[]) getObject(columnLabel);
     }
 }

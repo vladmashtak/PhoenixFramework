@@ -207,13 +207,23 @@ public class CachedResultSet implements ReadOnlyResultSet {
     }
 
     @Override
+    public BigDecimal getBigDecimal(int columnIndex) {
+        return (BigDecimal) getObject(columnIndex);
+    }
+
+    @Override
     public String getString(int columnIndex) {
         return (String) getObject(columnIndex);
     }
 
     @Override
-    public Object getObject(int columnIndex) {
-        return cachedResultByIndex.get(columnIndex - 1).get(cursorIndex);
+    public byte[] getBytes(final int columnIndex) {
+        return (byte[]) getObject(columnIndex);
+    }
+
+    @Override
+    public Date getDate(int columnIndex) {
+        return (Date) getObject(columnIndex);
     }
 
     @Override
@@ -227,18 +237,8 @@ public class CachedResultSet implements ReadOnlyResultSet {
     }
 
     @Override
-    public Date getDate(int columnIndex) {
-        return (Date) getObject(columnIndex);
-    }
-
-    @Override
-    public BigDecimal getBigDecimal(int columnIndex) {
-        return (BigDecimal) getObject(columnIndex);
-    }
-
-    @Override
-    public byte[] getBytes(final int columnIndex) {
-        return (byte[]) getObject(columnIndex);
+    public Object getObject(int columnIndex) {
+        return cachedResultByIndex.get(columnIndex - 1).get(cursorIndex);
     }
 
     @Override
@@ -277,18 +277,23 @@ public class CachedResultSet implements ReadOnlyResultSet {
     }
 
     @Override
+    public BigDecimal getBigDecimal(String columnLabel) {
+        return (BigDecimal) getObject(columnLabel);
+    }
+
+    @Override
     public String getString(String columnLabel) {
         return (String) getObject(columnLabel);
     }
 
     @Override
-    public Object getObject(String columnLabel) {
-        Integer columnIndex = columnLabelToIndexRegistry.get(columnLabel.toLowerCase());
-        if (columnIndex == null)
-        {
-            return null;
-        }
-        return getObject(columnIndex + 1);
+    public byte[] getBytes(final String columnLabel) {
+        return (byte[]) getObject(columnLabel);
+    }
+
+    @Override
+    public Date getDate(String columnLabel) {
+        return (Date) getObject(columnLabel);
     }
 
     @Override
@@ -302,17 +307,12 @@ public class CachedResultSet implements ReadOnlyResultSet {
     }
 
     @Override
-    public Date getDate(String columnLabel) {
-        return (Date) getObject(columnLabel);
-    }
-
-    @Override
-    public BigDecimal getBigDecimal(String columnLabel) {
-        return (BigDecimal) getObject(columnLabel);
-    }
-
-    @Override
-    public byte[] getBytes(final String columnLabel) {
-        return (byte[]) getObject(columnLabel);
+    public Object getObject(String columnLabel) {
+        Integer columnIndex = columnLabelToIndexRegistry.get(columnLabel.toLowerCase());
+        if (columnIndex == null)
+        {
+            return null;
+        }
+        return getObject(columnIndex + 1);
     }
 }

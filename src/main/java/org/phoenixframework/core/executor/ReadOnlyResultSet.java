@@ -78,6 +78,15 @@ public interface ReadOnlyResultSet {
     double getDouble(int columnIndex);
 
     /**
+     * Returns the value of {@code BigDecimal} object from column by index.
+     *
+     * @return the value of {@code BigDecimal} object
+     * @throws IndexOutOfBoundsException if the column index is not valid
+     * @throws ClassCastException if the column is of an inappropriate type
+     */
+    BigDecimal getBigDecimal(int columnIndex);
+
+    /**
      * Returns the value of {@code String} object from column by index.
      *
      * @return the value of {@code String} object
@@ -87,13 +96,22 @@ public interface ReadOnlyResultSet {
     String getString(int columnIndex);
 
     /**
-     * Returns the value of {@code Object} from column by index.
+     * Returns the value of {@code byte} array from column by index.
      *
-     * @return the value of {@code Object}
+     * @return the value of {@code byte} array
      * @throws IndexOutOfBoundsException if the column index is not valid
      * @throws ClassCastException if the column is of an inappropriate type
      */
-    Object getObject(int columnIndex);
+    byte[] getBytes(int columnIndex);
+
+    /**
+     * Returns the value of {@code Date} object from column by index.
+     *
+     * @return the value of {@code Date} object
+     * @throws IndexOutOfBoundsException if the column index is not valid
+     * @throws ClassCastException if the column is of an inappropriate type
+     */
+    Date getDate(int columnIndex);
 
     /**
      * Returns the value of {@code Time} object from column by index.
@@ -114,31 +132,13 @@ public interface ReadOnlyResultSet {
     Timestamp getTimestamp(int columnIndex);
 
     /**
-     * Returns the value of {@code Date} object from column by index.
+     * Returns the value of {@code Object} from column by index.
      *
-     * @return the value of {@code Date} object
+     * @return the value of {@code Object}
      * @throws IndexOutOfBoundsException if the column index is not valid
      * @throws ClassCastException if the column is of an inappropriate type
      */
-    Date getDate(int columnIndex);
-
-    /**
-     * Returns the value of {@code BigDecimal} object from column by index.
-     *
-     * @return the value of {@code BigDecimal} object
-     * @throws IndexOutOfBoundsException if the column index is not valid
-     * @throws ClassCastException if the column is of an inappropriate type
-     */
-    BigDecimal getBigDecimal(int columnIndex);
-
-    /**
-     * Returns the value of {@code byte} array from column by index.
-     *
-     * @return the value of {@code byte} array
-     * @throws IndexOutOfBoundsException if the column index is not valid
-     * @throws ClassCastException if the column is of an inappropriate type
-     */
-    byte[] getBytes(int columnIndex);
+    Object getObject(int columnIndex);
 
     /**
      * Returns the value of {@code Boolean} object from column by label.
@@ -204,6 +204,15 @@ public interface ReadOnlyResultSet {
     Double getDouble(String columnLabel);
 
     /**
+     * Returns the value of {@code BigDecimal} object from column by label.
+     *
+     * @return the value of {@code BigDecimal} object, or
+     *         {@code null} if the result set does not contain a column with this label
+     * @throws ClassCastException if the column is of an inappropriate type
+     */
+    BigDecimal getBigDecimal(String columnLabel);
+
+    /**
      * Returns the value of {@code String} object from column by label.
      *
      * @return the value of {@code String} object, or
@@ -213,13 +222,22 @@ public interface ReadOnlyResultSet {
     String getString(String columnLabel);
 
     /**
-     * Returns the value of {@code Object} from column by label.
+     * Returns the value of {@code byte} array from column by label.
      *
-     * @return the value of {@code Object}, or
+     * @return the value of {@code byte} array, or
      *         {@code null} if the result set does not contain a column with this label
      * @throws ClassCastException if the column is of an inappropriate type
      */
-    Object getObject(String columnLabel);
+    byte[] getBytes(String columnLabel);
+
+    /**
+     * Returns the value of {@code Date} object from column by label.
+     *
+     * @return the value of {@code Date} object, or
+     *         {@code null} if the result set does not contain a column with this label
+     * @throws ClassCastException if the column is of an inappropriate type
+     */
+    Date getDate(String columnLabel);
 
     /**
      * Returns the value of {@code Time} object from column by label.
@@ -240,29 +258,11 @@ public interface ReadOnlyResultSet {
     Timestamp getTimestamp(String columnLabel);
 
     /**
-     * Returns the value of {@code Date} object from column by label.
+     * Returns the value of {@code Object} from column by label.
      *
-     * @return the value of {@code Date} object, or
+     * @return the value of {@code Object}, or
      *         {@code null} if the result set does not contain a column with this label
      * @throws ClassCastException if the column is of an inappropriate type
      */
-    Date getDate(String columnLabel);
-
-    /**
-     * Returns the value of {@code BigDecimal} object from column by label.
-     *
-     * @return the value of {@code BigDecimal} object, or
-     *         {@code null} if the result set does not contain a column with this label
-     * @throws ClassCastException if the column is of an inappropriate type
-     */
-    BigDecimal getBigDecimal(String columnLabel);
-
-    /**
-     * Returns the value of {@code byte} array from column by label.
-     *
-     * @return the value of {@code byte} array, or
-     *         {@code null} if the result set does not contain a column with this label
-     * @throws ClassCastException if the column is of an inappropriate type
-     */
-    byte[] getBytes(String columnLabel);
+    Object getObject(String columnLabel);
 }

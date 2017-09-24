@@ -2,9 +2,9 @@ package org.phoenixframework.core.mapper;
 
 import org.phoenixframework.core.annotation.FromColumn;
 import org.phoenixframework.core.annotation.Transient;
-import org.phoenixframework.core.executor.ReadOnlyResultSet;
+import org.phoenixframework.core.session_factory.session.query.scrollable_result.ReadOnlyScrollableResult;
 import org.phoenixframework.core.util.ReflectionUtils;
-import org.phoenixframework.core.util.ResultSetMethodResolver;
+import org.phoenixframework.core.util.ScrollableResultMethodResolver;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -32,12 +32,12 @@ public class AliasResultMapper<T> extends CustomResultMapper<T> implements DataT
     }
 
     @Override
-    protected T map(ReadOnlyResultSet result) {
+    protected T map(ReadOnlyScrollableResult scrollableResult) {
         T object = ReflectionUtils.newInstance(classType);
         for (Map.Entry<FieldWrapper, Method> fieldValueFromMethod: fieldWrapperToMethodResolver.entrySet()) {
             FieldWrapper fieldWrapper = fieldValueFromMethod.getKey();
             Method method = fieldValueFromMethod.getValue();
-            Object value = ReflectionUtils.invokeMethod(result, method, fieldWrapper.getColumnLabel());
+            Object value = ReflectionUtils.invokeMethod(scrollableResult, method, fieldWrapper.getColumnLabel());
             ReflectionUtils.setValueToField(object, fieldWrapper.getField(), value);
         }
         return object;
@@ -62,7 +62,7 @@ public class AliasResultMapper<T> extends CustomResultMapper<T> implements DataT
                     FromColumn fromColumn = field.getAnnotation(FromColumn.class);
                     columnLabel = fromColumn.value();
                 }
-                Method method = ResultSetMethodResolver.getMethod(field.getType());
+                Method method = ScrollableResultMethodResolver.getMethod(field.getType());
                 fieldWrapperToMethodResolver.put(new FieldWrapper(field, columnLabel), method);
             }
         }

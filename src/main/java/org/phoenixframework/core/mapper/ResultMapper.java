@@ -1,6 +1,6 @@
 package org.phoenixframework.core.mapper;
 
-import org.phoenixframework.core.executor.CachedResultSet;
+import org.phoenixframework.core.session_factory.session.query.scrollable_result.CachedScrollableResult;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import java.util.List;
  * @param <T> the type of mapping object
  *
  * @author Oleg Marchenko
- * @see org.phoenixframework.core.executor.CachedResultSet
+ * @see org.phoenixframework.core.session_factory.session.query.scrollable_result.CachedScrollableResult
  */
 
 public interface ResultMapper<T> {
@@ -18,16 +18,16 @@ public interface ResultMapper<T> {
     /**
      * Returns unique mapping object.
      *
-     * @param result the data from database
+     * @param scrollableResult the data from database
      * @return mapping object
      */
-    T unique(CachedResultSet result);
+    T unique(CachedScrollableResult scrollableResult);
 
     /**
      * Returns list of mapping objects.
      *
-     * @param result the data from database
+     * @param scrollableResult the data from database
      * @return list of mapping objects
      */
-    List<T> list(CachedResultSet result);
+    List<T> list(CachedScrollableResult scrollableResult);
 }

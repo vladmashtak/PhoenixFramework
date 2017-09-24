@@ -1,7 +1,7 @@
 package org.phoenixframework.core.session_factory;
 
-import org.phoenixframework.core.session.Session;
-import org.phoenixframework.core.session.SessionImpl;
+import org.phoenixframework.core.session_factory.session.Session;
+import org.phoenixframework.core.session_factory.session.SessionImpl;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 /**
  * @author Oleg Marchenko
- * @see org.phoenixframework.core.session.Session
+ * @see org.phoenixframework.core.session_factory.session.Session
  */
 
 public final class SessionFactory {

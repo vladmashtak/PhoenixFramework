@@ -1,4 +1,4 @@
-package org.phoenixframework.core.executor;
+package org.phoenixframework.core.session_factory.session.query.scrollable_result;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -6,13 +6,12 @@ import java.sql.Time;
 import java.sql.Timestamp;
 
 /**
- * Interface provides read-only access for cached result set by column index or label.
+ * Interface provides read-only access for cached scrollable result by column index or label.
  *
  * @author Oleg Marchenko
- * @see java.sql.ResultSet
  */
 
-public interface ReadOnlyResultSet {
+public interface ReadOnlyScrollableResult {
 
     /**
      * Returns the value of {@code boolean} type from column by index.

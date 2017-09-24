@@ -1,12 +1,12 @@
-package org.phoenixframework.core.session;
+package org.phoenixframework.core.session_factory.session;
 
 /**
  * Allows to define unit of work.
- * A transaction is associated with a <code>Session</code> and is usually instantiated by
+ * A transaction is associated with a {@link Session} and is usually instantiated by
  * a call to {@link Session#beginTransaction()}.
  *
  * @author Oleg Marchenko
- * @see org.phoenixframework.core.session.Session
+ * @see org.phoenixframework.core.session_factory.session.Session
  */
 
 public interface Transaction {

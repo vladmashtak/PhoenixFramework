@@ -1,7 +1,7 @@
 package org.phoenixframework.core.mapper;
 
-import org.phoenixframework.core.executor.CachedResultSet;
-import org.phoenixframework.core.executor.ReadOnlyResultSet;
+import org.phoenixframework.core.session_factory.session.query.scrollable_result.CachedScrollableResult;
+import org.phoenixframework.core.session_factory.session.query.scrollable_result.ReadOnlyScrollableResult;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
@@ -11,31 +11,33 @@ import java.util.Map;
 
 /**
  * The <code>CustomResultMapper</code> allows to implement the logic of custom mapping
- * in method {@link #map(ReadOnlyResultSet)} for data object.
+ * in method {@link #map(ReadOnlyScrollableResult)} for data object.
+ *
+ * @param <T> the type of mapping object
  *
  * @author Oleg Marchenko
  * @see org.phoenixframework.core.mapper.ResultMapper
  * @see org.phoenixframework.core.mapper.InternalDataTransformer
- * @see org.phoenixframework.core.executor.ReadOnlyResultSet
- * @see org.phoenixframework.core.executor.CachedResultSet
+ * @see org.phoenixframework.core.session_factory.session.query.scrollable_result.ReadOnlyScrollableResult
+ * @see org.phoenixframework.core.session_factory.session.query.scrollable_result.CachedScrollableResult
  */
 
 public abstract class CustomResultMapper<T> extends InternalDataTransformer<T> implements ResultMapper<T> {
 
     @Override
-    public T unique(CachedResultSet result) {
-        if (result.next()) {
-            return map(result);
+    public T unique(CachedScrollableResult scrollableResult) {
+        if (scrollableResult.next()) {
+            return map(scrollableResult);
         }
         return null;
     }
 
     @Override
-    public List<T> list(CachedResultSet result) {
-        if (!result.isEmpty()) {
-            List<T> objects = new ArrayList<>(result.getRowCount());
-            while (result.next()) {
-                objects.add(map(result));
+    public List<T> list(CachedScrollableResult scrollableResult) {
+        if (!scrollableResult.isEmpty()) {
+            List<T> objects = new ArrayList<>(scrollableResult.getRowCount());
+            while (scrollableResult.next()) {
+                objects.add(map(scrollableResult));
             }
             return objects;
         }
@@ -43,8 +45,8 @@ public abstract class CustomResultMapper<T> extends InternalDataTransformer<T> i
     }
 
     @Override
-    public T toObject(ReadOnlyResultSet result) {
-        return map(result);
+    public T toObject(ReadOnlyScrollableResult scrollableResult) {
+        return map(scrollableResult);
     }
 
     @Override
@@ -55,8 +57,8 @@ public abstract class CustomResultMapper<T> extends InternalDataTransformer<T> i
     /**
      * Implementation of custom mapping object method.
      *
-     * @param result the result set from database
+     * @param scrollableResult the scrollable result from database
      * @return mapping data object
      */
-    protected abstract T map(ReadOnlyResultSet result);
+    protected abstract T map(ReadOnlyScrollableResult scrollableResult);
 }

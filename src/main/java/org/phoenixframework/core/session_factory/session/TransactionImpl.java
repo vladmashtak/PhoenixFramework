@@ -1,11 +1,11 @@
-package org.phoenixframework.core.session;
+package org.phoenixframework.core.session_factory.session;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
  * @author Oleg Marchenko
- * @see org.phoenixframework.core.session.Transaction
+ * @see org.phoenixframework.core.session_factory.session.Transaction
  */
 
 public class TransactionImpl implements Transaction {

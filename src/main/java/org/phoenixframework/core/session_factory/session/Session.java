@@ -1,6 +1,6 @@
-package org.phoenixframework.core.session;
+package org.phoenixframework.core.session_factory.session;
 
-import org.phoenixframework.core.query.Query;
+import org.phoenixframework.core.session_factory.session.query.Query;
 
 /**
  * The <code>Session</code> presents advanced capabilities over a standard {@link java.sql.Connection}.
@@ -29,8 +29,8 @@ import org.phoenixframework.core.query.Query;
  * }
  *
  * @author Oleg Marchenko
- * @see org.phoenixframework.core.query.Query
- * @see org.phoenixframework.core.session.Transaction
+ * @see org.phoenixframework.core.session_factory.session.query.Query
+ * @see org.phoenixframework.core.session_factory.session.Transaction
  */
 
 public interface Session extends AutoCloseable {

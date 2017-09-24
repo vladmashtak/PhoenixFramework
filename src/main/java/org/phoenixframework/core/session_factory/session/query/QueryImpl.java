@@ -1,13 +1,14 @@
-package org.phoenixframework.core.query;
+package org.phoenixframework.core.session_factory.session.query;
 
-import org.phoenixframework.core.executor.CachedResultSet;
+import org.phoenixframework.core.session_factory.session.query.scrollable_result.CachedScrollableResult;
 
 import java.math.BigDecimal;
 import java.sql.*;
+import java.util.Collection;
 
 /**
  * @author Oleg Marchenko
- * @see org.phoenixframework.core.query.Query
+ * @see Query
  */
 
 public class QueryImpl implements Query {
@@ -19,10 +20,10 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public CachedResultSet execute() {
+    public CachedScrollableResult execute() {
         try {
             try (ResultSet result = preparedStatement.executeQuery()) {
-                return new CachedResultSet(result);
+                return new CachedScrollableResult(result);
             }
         } catch (SQLException e) {
             throw new IllegalStateException(e);
@@ -225,10 +226,15 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public Query setParameters(Object... parameters) {
-        for (int i = 0; i < parameters.length; i++) {
-            setObject(i + 1, parameters[i]);
+    public Query setParameters(Object... parameterValues) {
+        for (int i = 0; i < parameterValues.length; i++) {
+            setObject(i + 1, parameterValues[i]);
         }
         return this;
+    }
+
+    @Override
+    public Query setParameters(final Collection<Object> parameterValues) {
+        return setParameters(parameterValues.toArray());
     }
 }

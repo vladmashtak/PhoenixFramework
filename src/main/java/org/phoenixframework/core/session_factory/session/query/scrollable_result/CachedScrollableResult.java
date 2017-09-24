@@ -1,4 +1,4 @@
-package org.phoenixframework.core.executor;
+package org.phoenixframework.core.session_factory.session.query.scrollable_result;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -11,10 +11,11 @@ import java.util.Map;
  * Caches data from the result set providing the same interaction interface.
  *
  * @author Oleg Marchenko
- * @see org.phoenixframework.core.executor.ReadOnlyResultSet
+ * @see org.phoenixframework.core.session_factory.session.query.scrollable_result.ReadOnlyScrollableResult
+ * @see java.sql.ResultSet
  */
 
-public class CachedResultSet implements ReadOnlyResultSet {
+public class CachedScrollableResult implements ReadOnlyScrollableResult {
     private static int DEFAULT_ROWS_CAPACITY = 64;
     private static int BEFORE_FIRST_ROW_INDEX = -1;
 
@@ -27,7 +28,7 @@ public class CachedResultSet implements ReadOnlyResultSet {
      * @param result inbound result set
      * @throws SQLException if a database access error occurs
      */
-    public CachedResultSet(ResultSet result) throws SQLException {
+    public CachedScrollableResult(ResultSet result) throws SQLException {
         ResultSetMetaData metaData = result.getMetaData();
         int columnCount = metaData.getColumnCount();
 

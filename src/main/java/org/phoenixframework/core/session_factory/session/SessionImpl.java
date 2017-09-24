@@ -1,14 +1,14 @@
-package org.phoenixframework.core.session;
+package org.phoenixframework.core.session_factory.session;
 
-import org.phoenixframework.core.query.Query;
-import org.phoenixframework.core.query.QueryImpl;
+import org.phoenixframework.core.session_factory.session.query.Query;
+import org.phoenixframework.core.session_factory.session.query.QueryImpl;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
  * @author Oleg Marchenko
- * @see org.phoenixframework.core.session.Session
+ * @see org.phoenixframework.core.session_factory.session.Session
  */
 
 public class SessionImpl implements Session {

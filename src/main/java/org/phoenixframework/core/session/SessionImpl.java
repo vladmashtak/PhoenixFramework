@@ -1,10 +1,9 @@
 package org.phoenixframework.core.session;
 
-import org.phoenixframework.core.executor.CachedResultSet;
+import org.phoenixframework.core.query.Query;
+import org.phoenixframework.core.query.QueryImpl;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -28,22 +27,9 @@ public class SessionImpl implements Session {
     }
 
     @Override
-    public CachedResultSet executeQuery(String query, Object... params) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            setParameters(preparedStatement, params);
-            try (ResultSet result = preparedStatement.executeQuery()) {
-                return new CachedResultSet(result);
-            }
-        } catch (SQLException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    @Override
-    public int executeUpdate(String query, Object... params) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            setParameters(preparedStatement, params);
-            return preparedStatement.executeUpdate();
+    public Query createQuery(String sqlQuery) {
+        try {
+            return new QueryImpl(connection.prepareStatement(sqlQuery));
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
@@ -66,12 +52,6 @@ public class SessionImpl implements Session {
             }
         } catch (SQLException e) {
             throw new IllegalStateException(e);
-        }
-    }
-
-    private void setParameters(PreparedStatement preparedStatement, Object... params) throws SQLException {
-        for (int i = 0; i < params.length; i++) {
-            preparedStatement.setObject(i + 1, params[i]);
         }
     }
 }

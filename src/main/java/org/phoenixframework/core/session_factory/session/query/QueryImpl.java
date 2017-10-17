@@ -1,5 +1,6 @@
 package org.phoenixframework.core.session_factory.session.query;
 
+import org.phoenixframework.core.exception.PhoenixException;
 import org.phoenixframework.core.session_factory.session.query.scrollable_result.CachedScrollableResult;
 
 import java.math.BigDecimal;
@@ -8,7 +9,7 @@ import java.util.Collection;
 
 /**
  * @author Oleg Marchenko
- * @see Query
+ * @see org.phoenixframework.core.session_factory.session.query.Query
  */
 
 public class QueryImpl implements Query {
@@ -26,7 +27,7 @@ public class QueryImpl implements Query {
                 return new CachedScrollableResult(result);
             }
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot execute query", e);
         } finally {
             close();
         }
@@ -37,7 +38,7 @@ public class QueryImpl implements Query {
         try {
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot execute update", e);
         } finally {
             close();
         }
@@ -48,7 +49,7 @@ public class QueryImpl implements Query {
         try {
             preparedStatement.addBatch();
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot add new batch", e);
         }
     }
 
@@ -57,7 +58,7 @@ public class QueryImpl implements Query {
         try {
             return preparedStatement.executeBatch();
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot execute batch", e);
         } finally {
             close();
         }
@@ -68,7 +69,7 @@ public class QueryImpl implements Query {
         try {
             return !preparedStatement.isClosed();
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException(e);
         }
     }
 
@@ -81,7 +82,7 @@ public class QueryImpl implements Query {
                 preparedStatement.close();
             }
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot close query", e);
         }
     }
 
@@ -90,7 +91,7 @@ public class QueryImpl implements Query {
         try {
             preparedStatement.setBoolean(paramIndex, value);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot set parameter", e);
         }
         return this;
     }
@@ -100,7 +101,7 @@ public class QueryImpl implements Query {
         try {
             preparedStatement.setByte(paramIndex, value);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot set parameter", e);
         }
         return this;
     }
@@ -110,7 +111,7 @@ public class QueryImpl implements Query {
         try {
             preparedStatement.setShort(paramIndex, value);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot set parameter", e);
         }
         return this;
     }
@@ -120,7 +121,7 @@ public class QueryImpl implements Query {
         try {
             preparedStatement.setInt(paramIndex, value);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot set parameter", e);
         }
         return this;
     }
@@ -130,7 +131,7 @@ public class QueryImpl implements Query {
         try {
             preparedStatement.setLong(paramIndex, value);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot set parameter", e);
         }
         return this;
     }
@@ -140,7 +141,7 @@ public class QueryImpl implements Query {
         try {
             preparedStatement.setFloat(paramIndex, value);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot set parameter", e);
         }
         return this;
     }
@@ -150,7 +151,7 @@ public class QueryImpl implements Query {
         try {
             preparedStatement.setDouble(paramIndex, value);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot set parameter", e);
         }
         return this;
     }
@@ -160,7 +161,7 @@ public class QueryImpl implements Query {
         try {
             preparedStatement.setBigDecimal(paramIndex, value);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot set parameter", e);
         }
         return this;
     }
@@ -170,7 +171,7 @@ public class QueryImpl implements Query {
         try {
             preparedStatement.setString(paramIndex, value);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot set parameter", e);
         }
         return this;
     }
@@ -180,7 +181,7 @@ public class QueryImpl implements Query {
         try {
             preparedStatement.setBytes(paramIndex, value);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot set parameter", e);
         }
         return this;
     }
@@ -190,7 +191,7 @@ public class QueryImpl implements Query {
         try {
             preparedStatement.setDate(paramIndex, value);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot set parameter", e);
         }
         return this;
     }
@@ -200,7 +201,7 @@ public class QueryImpl implements Query {
         try {
             preparedStatement.setTime(paramIndex, value);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot set parameter", e);
         }
         return this;
     }
@@ -210,7 +211,7 @@ public class QueryImpl implements Query {
         try {
             preparedStatement.setTimestamp(paramIndex, value);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot set parameter", e);
         }
         return this;
     }
@@ -220,7 +221,7 @@ public class QueryImpl implements Query {
         try {
             preparedStatement.setObject(paramIndex, value);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot set parameter", e);
         }
         return this;
     }
@@ -234,7 +235,7 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public Query setParameters(final Collection<Object> parameterValues) {
+    public Query setParameters(Collection<Object> parameterValues) {
         return setParameters(parameterValues.toArray());
     }
 }

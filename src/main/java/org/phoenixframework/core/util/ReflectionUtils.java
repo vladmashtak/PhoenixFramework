@@ -9,7 +9,7 @@ import java.util.Arrays;
  * @author Oleg Marchenko
  */
 
-public class ReflectionUtils {
+public final class ReflectionUtils {
 
     public static <T> T newInstance(Class<T> classType) {
         try {

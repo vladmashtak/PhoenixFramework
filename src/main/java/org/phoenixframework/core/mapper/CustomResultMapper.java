@@ -17,12 +17,12 @@ import java.util.Map;
  *
  * @author Oleg Marchenko
  * @see org.phoenixframework.core.mapper.ResultMapper
- * @see org.phoenixframework.core.mapper.InternalDataTransformer
+ * @see InternalObjectTransformer
  * @see org.phoenixframework.core.session_factory.session.query.scrollable_result.ReadOnlyScrollableResult
  * @see org.phoenixframework.core.session_factory.session.query.scrollable_result.CachedScrollableResult
  */
 
-public abstract class CustomResultMapper<T> extends InternalDataTransformer<T> implements ResultMapper<T> {
+public abstract class CustomResultMapper<T> extends InternalObjectTransformer implements ResultMapper<T> {
 
     @Override
     public T unique(CachedScrollableResult scrollableResult) {
@@ -45,12 +45,12 @@ public abstract class CustomResultMapper<T> extends InternalDataTransformer<T> i
     }
 
     @Override
-    public T toObject(ReadOnlyScrollableResult scrollableResult) {
+    public Object toObject(ReadOnlyScrollableResult scrollableResult) {
         return map(scrollableResult);
     }
 
     @Override
-    public Map<String, Object> toNamedValues(T object) {
+    public Map<String, Object> toNamedValues(Object object) {
         throw new NotImplementedException();
     }
 

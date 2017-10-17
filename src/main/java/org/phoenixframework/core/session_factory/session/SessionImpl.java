@@ -1,5 +1,6 @@
 package org.phoenixframework.core.session_factory.session;
 
+import org.phoenixframework.core.exception.PhoenixException;
 import org.phoenixframework.core.session_factory.session.query.Query;
 import org.phoenixframework.core.session_factory.session.query.QueryImpl;
 
@@ -31,7 +32,7 @@ public class SessionImpl implements Session {
         try {
             return new QueryImpl(connection.prepareStatement(sqlQuery));
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot create query", e);
         }
     }
 
@@ -40,7 +41,7 @@ public class SessionImpl implements Session {
         try {
             return !connection.isClosed();
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException(e);
         }
     }
 
@@ -51,7 +52,7 @@ public class SessionImpl implements Session {
                 connection.close();
             }
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot close session", e);
         }
     }
 }

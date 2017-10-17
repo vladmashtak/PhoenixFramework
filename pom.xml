@@ -4,7 +4,7 @@
 
     <groupId>org.phoenixframework.phoenix-core</groupId>
     <artifactId>phoenix-core</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Phoenix Framework</name>
@@ -26,6 +26,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
+
+        <junit.version>4.12</junit.version>
     </properties>
 
     <dependencies>

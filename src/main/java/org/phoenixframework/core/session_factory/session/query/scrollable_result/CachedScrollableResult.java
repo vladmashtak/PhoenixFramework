@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Caches data from the result set providing the same interaction interface.
+ * Caches data from the {@link ResultSet} providing the same interaction interface.
  *
  * @author Oleg Marchenko
  * @see org.phoenixframework.core.session_factory.session.query.scrollable_result.ReadOnlyScrollableResult

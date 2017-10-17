@@ -1,5 +1,6 @@
 package org.phoenixframework.core.session_factory;
 
+import org.phoenixframework.core.exception.PhoenixException;
 import org.phoenixframework.core.session_factory.session.Session;
 import org.phoenixframework.core.session_factory.session.SessionImpl;
 
@@ -32,10 +33,10 @@ public final class SessionFactory {
     /**
      * Register the data source in session factory.
      *
-     * @param dataSourceSupplier data source supplier
+     * @param supplier data source supplier
      */
-    public void registerDataSource(DataSourceSupplier dataSourceSupplier) {
-        this.dataSource = dataSourceSupplier.getDataSource();
+    public void registerDataSource(DataSourceSupplier supplier) {
+        this.dataSource = supplier.getDataSource();
     }
 
     /**
@@ -44,10 +45,14 @@ public final class SessionFactory {
      * @return a new session
      */
     public Session openSession() {
+        if (dataSource == null) {
+            throw new PhoenixException("DataSource is not registered");
+        }
+
         try {
             return openSession(dataSource.getConnection());
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot open session", e);
         }
     }
 

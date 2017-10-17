@@ -1,5 +1,7 @@
 package org.phoenixframework.core.session_factory.session;
 
+import org.phoenixframework.core.exception.PhoenixException;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -23,7 +25,7 @@ public class TransactionImpl implements Transaction {
                 connection.setAutoCommit(false);
             }
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot begin transaction", e);
         }
     }
 
@@ -34,7 +36,7 @@ public class TransactionImpl implements Transaction {
                 connection.commit();
             }
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot commit transaction", e);
         }
     }
 
@@ -45,7 +47,7 @@ public class TransactionImpl implements Transaction {
                 connection.rollback();
             }
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw new PhoenixException("Cannot rollback transaction", e);
         }
     }
 }

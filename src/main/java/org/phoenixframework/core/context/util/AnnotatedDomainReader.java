@@ -1,9 +1,6 @@
 package org.phoenixframework.core.context.util;
 
-import org.phoenixframework.core.annotation.Domain;
-import org.phoenixframework.core.annotation.FromColumn;
-import org.phoenixframework.core.annotation.Transient;
-import org.phoenixframework.core.annotation.Wrapper;
+import org.phoenixframework.core.annotation.*;
 import org.phoenixframework.core.context.registry.DomainMetadataRegistry;
 import org.phoenixframework.core.context.registry.metadata.DomainMetadataHolder;
 import org.phoenixframework.core.context.registry.metadata.FieldMetadataHolder;
@@ -30,12 +27,14 @@ public final class AnnotatedDomainReader {
 
     protected void doRegister(Class<?> candidateClass) {
         if (!registry.containsDomain(candidateClass) && candidateClass.isAnnotationPresent(Domain.class)) {
-            Class<?> candidateSuperclass = candidateClass.getSuperclass();
-            if (!Object.class.equals(candidateSuperclass)) {
-                doRegister(candidateSuperclass);
-            }
-
             DomainMetadataHolder domainMetadataHolder = new DomainMetadataHolder(candidateClass);
+
+            NamedQueries namedQueries = candidateClass.getAnnotation(NamedQueries.class);
+            if (namedQueries != null) {
+                for (NamedQuery namedQuery: namedQueries.value()) {
+                    domainMetadataHolder.registerNamedQuery(namedQuery.name(), namedQuery.query());
+                }
+            }
 
             Field[] fields = candidateClass.getDeclaredFields();
             for (Field field: fields) {
@@ -58,6 +57,11 @@ public final class AnnotatedDomainReader {
                 }
             }
             registry.addMetadata(domainMetadataHolder);
+
+            Class<?> candidateSuperclass = candidateClass.getSuperclass();
+            if (!Object.class.equals(candidateSuperclass)) {
+                doRegister(candidateSuperclass);
+            }
         }
     }
 }

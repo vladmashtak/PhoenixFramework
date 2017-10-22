@@ -7,11 +7,13 @@ import org.phoenixframework.core.session_factory.session.query.Query;
  *
  * Examples:
  * try (Session session = SessionFactory.instance().openSession()) {
- *     session.createQuery("...");
+ *     session
+ *         .createQuery("...");
  * }
  *
  * try (Session session = SessionFactory.instance().openSession()) {
- *     session.createQuery("...");
+ *     session
+ *         .createQuery("...");
  * } catch (Exception e) {
  *
  * }
@@ -19,7 +21,8 @@ import org.phoenixframework.core.session_factory.session.query.Query;
  * try (Session session = SessionFactory.instance().openSession()) {
  *     Transaction tx = session.beginTransaction();
  *     try {
- *         session.createQuery("...")
+ *         session
+ *             .createQuery("...")
  *             .executeUpdate();
  *
  *         tx.commit();
@@ -49,6 +52,15 @@ public interface Session extends AutoCloseable {
      * @return a new query for executing
      */
     Query createQuery(String sqlQuery);
+
+    /**
+     * Creates a new named query for executing.
+     *
+     * @param queryName query name
+     * @param domainClass registered domain class
+     * @return a new named query for executing
+     */
+    Query createNamedQuery(String queryName, Class<?> domainClass);
 
     /**
      * Returns <tt>true</tt> if the session is still open.

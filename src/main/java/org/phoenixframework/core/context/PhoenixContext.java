@@ -7,6 +7,12 @@ import org.phoenixframework.core.context.util.AnnotatedDomainReader;
 import org.phoenixframework.core.context.util.ClassPathDomainScanner;
 import org.phoenixframework.core.mapper.ObjectTransformer;
 import org.phoenixframework.core.mapper.ResultMapper;
+import org.phoenixframework.core.mapper.single_wrap.*;
+
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 
 /**
  * @author Oleg Marchenko
@@ -18,6 +24,19 @@ public final class PhoenixContext {
     private final DomainTransformerRegistry domainTransformerRegistry = new DomainTransformerRegistry();
 
     public PhoenixContext() {
+        registerTransformer(Boolean.class, new BooleanResultMapper());
+        registerTransformer(Byte.class, new ByteResultMapper());
+        registerTransformer(Short.class, new ShortResultMapper());
+        registerTransformer(Integer.class, new IntegerResultMapper());
+        registerTransformer(Long.class, new LongResultMapper());
+        registerTransformer(Float.class, new FloatResultMapper());
+        registerTransformer(Double.class, new DoubleResultMapper());
+        registerTransformer(BigDecimal.class, new BigDecimalResultMapper());
+        registerTransformer(String.class, new StringResultMapper());
+        registerTransformer(byte[].class, new ByteArrayResultMapper());
+        registerTransformer(Date.class, new DateResultMapper());
+        registerTransformer(Time.class, new TimeResultMapper());
+        registerTransformer(Timestamp.class, new TimestampResultMapper());
     }
 
     public void register(Class<?>... domainClasses) {

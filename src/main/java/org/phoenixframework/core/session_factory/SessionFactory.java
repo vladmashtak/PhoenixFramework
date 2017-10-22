@@ -1,5 +1,6 @@
 package org.phoenixframework.core.session_factory;
 
+import org.phoenixframework.core.context.PhoenixContext;
 import org.phoenixframework.core.exception.PhoenixException;
 import org.phoenixframework.core.session_factory.session.Session;
 import org.phoenixframework.core.session_factory.session.SessionImpl;
@@ -26,6 +27,7 @@ public final class SessionFactory {
     }
 
     private DataSource dataSource;
+    private PhoenixContext context;
 
     private SessionFactory() {
     }
@@ -37,6 +39,14 @@ public final class SessionFactory {
      */
     public void registerDataSource(DataSourceSupplier supplier) {
         this.dataSource = supplier.getDataSource();
+    }
+
+    public PhoenixContext getContext() {
+        return context;
+    }
+
+    public void registerContext(PhoenixContext context) {
+        this.context = context;
     }
 
     /**
@@ -63,6 +73,6 @@ public final class SessionFactory {
      * @return a new session with custom connection
      */
     public Session openSession(Connection connection) {
-        return new SessionImpl(connection);
+        return new SessionImpl(connection, context);
     }
 }

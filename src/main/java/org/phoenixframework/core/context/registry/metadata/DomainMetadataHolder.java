@@ -1,6 +1,7 @@
 package org.phoenixframework.core.context.registry.metadata;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -12,7 +13,8 @@ import java.util.Map;
 public class DomainMetadataHolder {
 
     private final Class<?> domainClass;
-    private final Map<String, FieldMetadataHolder> registry = new LinkedHashMap<>();
+    private final Map<String, FieldMetadataHolder> fieldMetadataRegistry = new LinkedHashMap<>();
+    private final Map<String, String> namedQueryRegistry = new HashMap<>();
 
     public DomainMetadataHolder(Class<?> domainClass) {
         this.domainClass = domainClass;
@@ -23,14 +25,22 @@ public class DomainMetadataHolder {
     }
 
     public Collection<FieldMetadataHolder> getAllFieldMetadata() {
-        return registry.values();
+        return fieldMetadataRegistry.values();
     }
 
     public FieldMetadataHolder getFieldMetadata(String fieldName) {
-        return registry.get(fieldName);
+        return fieldMetadataRegistry.get(fieldName);
     }
 
     public void addFieldMetadata(FieldMetadataHolder fieldMetadataHolder) {
-        registry.put(fieldMetadataHolder.getFieldName(), fieldMetadataHolder);
+        fieldMetadataRegistry.put(fieldMetadataHolder.getFieldName(), fieldMetadataHolder);
+    }
+
+    public String getNamedQuery(String queryName) {
+        return namedQueryRegistry.get(queryName);
+    }
+
+    public void registerNamedQuery(String queryName, String query) {
+        namedQueryRegistry.put(queryName, query);
     }
 }

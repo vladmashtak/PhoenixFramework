@@ -50,21 +50,20 @@ try (Session session = SessionFactory.instance().openSession()) {
 which describes the transformation logic.
 
 ```java
-ResultMapper<MovieDto> movieMapper = new CustomResultMapper<MovieDto>() {
+ResultMapper<Movie> movieMapper = new CustomResultMapper<Movie>() {
     @Override
-    protected MovieDto map(ReadOnlyScrollableResult scrollableResult) {
-        MovieDto movieDto = new MovieDto();
-        movieDto.setId(scrollableResult.getInt("id"));
-        movieDto.setOriginalName(scrollableResult.getString("original_name"));
-        movieDto.setYear(scrollableResult.getInt("year"));
-        movieDto.setDuration(scrollableResult.getInt("duration"));
-        return movieDto;
+    protected Movie map(ReadOnlyScrollableResult scrollableResult) {
+        Movie movie = new Movie();
+        movie.setId(scrollableResult.getInt("id"));
+        movie.setOriginalName(scrollableResult.getString("original_name"));
+        movie.setYear(scrollableResult.getInt("year"));
+        return movie;
     }
 };
 ```
 But you can also use **AliasResultMapper**, which with the help of `Reflection API` will make the transformation itself.
 ```java
-ResultMapper<MovieDto> movieMapper = new AliasResultMapper<>(MovieDto.class);
+ResultMapper<Movie> movieMapper = new AliasResultMapper<>(Movie.class);
 ```
 
 ## Example ##
@@ -77,8 +76,6 @@ CREATE TABLE movie_management.movies(
     "year" SMALLINT NOT NULL,
     rating REAL DEFAULT 0.0,
     votes_count BIGINT DEFAULT 0,
-    duration SMALLINT DEFAULT 0,
-    last_update DATE NOT NULL,
     PRIMARY KEY (id)
 );
 ```
@@ -87,37 +84,52 @@ and we need to get the following data: ***id, original_name, year, rating***
 Create domain object:
 ```java
 @Domain
-public class MovieDto {
+@NamedQueries({
+        @NamedQuery(name = "findAllMovies",
+                    query = "SELECT id, original_name, \"year\", rating " +
+                            "FROM movie_management.movies " +
+                            "ORDER BY id " +
+                            "OFFSET ? " +
+                            "LIMIT ?"),
+        @NamedQuery(name = "findMovieById",
+                    query = "SELECT id, original_name, \"year\", rating " +
+                            "FROM movie_management.movies " +
+                            "WHERE id = ?"),
+})
+public class Movie {
     private int id;
     @FromColumn("original_name")
     private String originalName;
     private int year;
     private double rating;
-    
+
     // default constructor and getters/setters
 }
 ```
 Annotation ```@Domain``` allows to mark a class as domain object.
+
+Annotations ```@NamedQueries``` and ```@NamedQuery``` allows to define a set of named queries for this domain class.
+
 Annotation ```@FromColumn``` allows to specify a column name if it does not match the field name.
 
 ```java
-ResultMapper<MovieDto> movieMapper = new AliasResultMapper<MovieDto>();
+PhoenixContext context = new PhoenixContext();
+context.register(Movie.class);
+context.registerTransformer(Movie.class, new AliasResultMapper<>(context, Movie.class));
+
+SessionFactory.instance().registerContext(context);
 
 try (Session session = SessionFactory.instance().openSession()) {
-    CachedScrollableResult result = session
-            .createQuery("SELECT id, original_name, \"year\", rating " +
-                         "FROM movie_management.movies " +
-                         "WHERE id = ?")
-            .setInt(1, 1)
-            .execute();
-    MovieDto movie = movieMapper.unique(result);
+    Movie movie = session
+            .createNamedQuery(Movie.class, "findMovieById")
+            .setInt(1)
+            .unique();
     // Work with movie object
 
-    CachedScrollableResult result = session.createQuery(
-            "SELECT id, original_name, \"year\", rating " +
-            "FROM movie_management.movies")
-            .execute();
-    List<MovieDto> movies = movieMapper.list(result);
+    List<Movie> movies = session
+            .createNamedQuery(Movie.class, "findAllMovies")
+            .setParameters(0, 10)
+            .list();
     // Work with list of movies
 }
 ```

@@ -3,41 +3,23 @@ package org.phoenixframework.core.context;
 import org.phoenixframework.core.context.registry.DomainMetadataRegistry;
 import org.phoenixframework.core.context.registry.DomainTransformerRegistry;
 import org.phoenixframework.core.context.registry.metadata.DomainMetadataHolder;
+import org.phoenixframework.core.context.registry.metadata.NamedQueryMetadataHolder;
 import org.phoenixframework.core.context.util.AnnotatedDomainReader;
 import org.phoenixframework.core.context.util.ClassPathDomainScanner;
+import org.phoenixframework.core.exception.PhoenixException;
 import org.phoenixframework.core.mapper.ObjectTransformer;
 import org.phoenixframework.core.mapper.ResultMapper;
-import org.phoenixframework.core.mapper.single_wrap.*;
-
-import java.math.BigDecimal;
-import java.sql.Date;
-import java.sql.Time;
-import java.sql.Timestamp;
 
 /**
  * @author Oleg Marchenko
+ * @see org.phoenixframework.core.context.registry.DomainMetadataRegistry
+ * @see org.phoenixframework.core.context.registry.DomainTransformerRegistry
  */
 
 public final class PhoenixContext {
 
     private final DomainMetadataRegistry domainMetadataRegistry = new DomainMetadataRegistry();
     private final DomainTransformerRegistry domainTransformerRegistry = new DomainTransformerRegistry();
-
-    public PhoenixContext() {
-        registerTransformer(Boolean.class, new BooleanResultMapper());
-        registerTransformer(Byte.class, new ByteResultMapper());
-        registerTransformer(Short.class, new ShortResultMapper());
-        registerTransformer(Integer.class, new IntegerResultMapper());
-        registerTransformer(Long.class, new LongResultMapper());
-        registerTransformer(Float.class, new FloatResultMapper());
-        registerTransformer(Double.class, new DoubleResultMapper());
-        registerTransformer(BigDecimal.class, new BigDecimalResultMapper());
-        registerTransformer(String.class, new StringResultMapper());
-        registerTransformer(byte[].class, new ByteArrayResultMapper());
-        registerTransformer(Date.class, new DateResultMapper());
-        registerTransformer(Time.class, new TimeResultMapper());
-        registerTransformer(Timestamp.class, new TimestampResultMapper());
-    }
 
     public void register(Class<?>... domainClasses) {
         AnnotatedDomainReader reader = new AnnotatedDomainReader(domainMetadataRegistry);
@@ -50,18 +32,39 @@ public final class PhoenixContext {
     }
 
     public void registerTransformer(Class<?> domainClass, ObjectTransformer transformer) {
-        domainTransformerRegistry.addTransformer(domainClass, transformer);
+        domainTransformerRegistry.registerTransformer(domainClass, transformer);
     }
 
     public DomainMetadataHolder getDomainMetadata(Class<?> domainClass) {
-        return domainMetadataRegistry.getMetadata(domainClass);
+        DomainMetadataHolder domainMetadata = domainMetadataRegistry.getMetadata(domainClass);
+        if (domainMetadata == null) {
+            throw new PhoenixException("Metadata for class \"" + domainClass.getSimpleName() + "\" is not registered");
+        }
+        return domainMetadata;
     }
 
     public ObjectTransformer getTransformer(Class<?> domainClass) {
-        return domainTransformerRegistry.getTransformer(domainClass);
+        ObjectTransformer transformer = domainTransformerRegistry.getTransformer(domainClass);
+        if (transformer == null) {
+            throw new PhoenixException("Object transformer for class \"" + domainClass.getSimpleName() + "\" is not registered");
+        }
+        return transformer;
     }
 
     public <T> ResultMapper<T> getMapper(Class<T> domainClass) {
-        return domainTransformerRegistry.getMapper(domainClass);
+        ResultMapper<T> mapper = domainTransformerRegistry.getMapper(domainClass);
+        if (mapper == null) {
+            throw new PhoenixException("Result mapper for class \"" + domainClass.getSimpleName() + "\" is not registered");
+        }
+        return mapper;
+    }
+
+    public NamedQueryMetadataHolder getNamedQueryMetadata(Class<?> domainClass, String queryName) {
+        DomainMetadataHolder domainMetadata = getDomainMetadata(domainClass);
+        NamedQueryMetadataHolder namedQueryMetadata = domainMetadata.getNamedQueryMetadata(queryName);
+        if (namedQueryMetadata == null) {
+            throw new PhoenixException("Named query \"" + queryName + "\" for class \"" + domainClass.getSimpleName() + "\" is not registered");
+        }
+        return namedQueryMetadata;
     }
 }

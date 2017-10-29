@@ -13,8 +13,8 @@ import java.util.Map;
 public class DomainMetadataHolder {
 
     private final Class<?> domainClass;
+    private final Map<String, NamedQueryMetadataHolder> namedQueryMetadataRegistry = new HashMap<>();
     private final Map<String, FieldMetadataHolder> fieldMetadataRegistry = new LinkedHashMap<>();
-    private final Map<String, String> namedQueryRegistry = new HashMap<>();
 
     public DomainMetadataHolder(Class<?> domainClass) {
         this.domainClass = domainClass;
@@ -36,11 +36,12 @@ public class DomainMetadataHolder {
         fieldMetadataRegistry.put(fieldMetadataHolder.getFieldName(), fieldMetadataHolder);
     }
 
-    public String getNamedQuery(String queryName) {
-        return namedQueryRegistry.get(queryName);
+    public NamedQueryMetadataHolder getNamedQueryMetadata(String queryName) {
+        return namedQueryMetadataRegistry.get(queryName);
     }
 
-    public void registerNamedQuery(String queryName, String query) {
-        namedQueryRegistry.put(queryName, query);
+    public void addNamedQueryMetadata(NamedQueryMetadataHolder holder) {
+        String queryName = holder.getQueryName();
+        namedQueryMetadataRegistry.put(queryName, holder);
     }
 }

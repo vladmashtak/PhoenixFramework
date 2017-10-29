@@ -4,6 +4,7 @@ import org.phoenixframework.core.annotation.*;
 import org.phoenixframework.core.context.registry.DomainMetadataRegistry;
 import org.phoenixframework.core.context.registry.metadata.DomainMetadataHolder;
 import org.phoenixframework.core.context.registry.metadata.FieldMetadataHolder;
+import org.phoenixframework.core.context.registry.metadata.NamedQueryMetadataHolder;
 
 import java.lang.reflect.Field;
 
@@ -26,13 +27,25 @@ public final class AnnotatedDomainReader {
     }
 
     protected void doRegister(Class<?> candidateClass) {
-        if (!registry.containsDomain(candidateClass) && candidateClass.isAnnotationPresent(Domain.class)) {
+        if (!registry.isRegistered(candidateClass) && candidateClass.isAnnotationPresent(Domain.class)) {
             DomainMetadataHolder domainMetadataHolder = new DomainMetadataHolder(candidateClass);
+
+            Class<?> candidateSuperclass = candidateClass.getSuperclass();
+            if (!Object.class.equals(candidateSuperclass)) {
+                doRegister(candidateSuperclass);
+            }
 
             NamedQueries namedQueries = candidateClass.getAnnotation(NamedQueries.class);
             if (namedQueries != null) {
                 for (NamedQuery namedQuery: namedQueries.value()) {
-                    domainMetadataHolder.registerNamedQuery(namedQuery.name(), namedQuery.query());
+                    Class<?> returnType = namedQuery.returnType();
+                    if (Object.class.equals(returnType)) {
+                        returnType = candidateClass;
+                    }
+
+                    NamedQueryMetadataHolder namedQueryMetadataHolder =
+                            new NamedQueryMetadataHolder(namedQuery.name(), namedQuery.query(), returnType);
+                    domainMetadataHolder.addNamedQueryMetadata(namedQueryMetadataHolder);
                 }
             }
 
@@ -56,12 +69,7 @@ public final class AnnotatedDomainReader {
                     domainMetadataHolder.addFieldMetadata(fieldMetadataHolder);
                 }
             }
-            registry.addMetadata(domainMetadataHolder);
-
-            Class<?> candidateSuperclass = candidateClass.getSuperclass();
-            if (!Object.class.equals(candidateSuperclass)) {
-                doRegister(candidateSuperclass);
-            }
+            registry.registerMetadata(domainMetadataHolder);
         }
     }
 }

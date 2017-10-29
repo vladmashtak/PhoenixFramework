@@ -17,7 +17,7 @@ import java.util.Map;
  *
  * @author Oleg Marchenko
  * @see org.phoenixframework.core.mapper.ResultMapper
- * @see InternalObjectTransformer
+ * @see org.phoenixframework.core.mapper.InternalObjectTransformer
  * @see org.phoenixframework.core.session_factory.session.query.scrollable_result.ReadOnlyScrollableResult
  * @see org.phoenixframework.core.session_factory.session.query.scrollable_result.CachedScrollableResult
  */

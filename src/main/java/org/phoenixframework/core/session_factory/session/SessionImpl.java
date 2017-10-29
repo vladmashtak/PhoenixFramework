@@ -1,12 +1,16 @@
 package org.phoenixframework.core.session_factory.session;
 
 import org.phoenixframework.core.context.PhoenixContext;
-import org.phoenixframework.core.context.registry.metadata.DomainMetadataHolder;
+import org.phoenixframework.core.context.registry.metadata.NamedQueryMetadataHolder;
 import org.phoenixframework.core.exception.PhoenixException;
+import org.phoenixframework.core.mapper.ResultMapper;
+import org.phoenixframework.core.session_factory.session.query.NamedQuery;
+import org.phoenixframework.core.session_factory.session.query.NamedQueryImpl;
 import org.phoenixframework.core.session_factory.session.query.Query;
 import org.phoenixframework.core.session_factory.session.query.QueryImpl;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
@@ -45,19 +49,17 @@ public class SessionImpl implements Session {
     }
 
     @Override
-    public Query createNamedQuery(String queryName, Class<?> domainClass) {
-        DomainMetadataHolder domainMetadata = context.getDomainMetadata(domainClass);
-        if (domainMetadata == null) {
-            throw new PhoenixException("Domain object for class \"" + domainClass.getSimpleName() + "\" is not registered");
-        }
+    public <T> NamedQuery<T> createNamedQuery(Class<T> domainClass, String queryName) {
+        return createNamedQuery(domainClass, queryName, domainClass);
+    }
 
-        String sqlQuery = domainMetadata.getNamedQuery(queryName);
-        if (sqlQuery == null) {
-            throw new PhoenixException("Named query \"" + queryName + "\" for domain object \"" + domainClass.getSimpleName() + "\" is not registered");
-        }
-
+    @Override
+    public <T> NamedQuery<T> createNamedQuery(Class<?> domainClass, String queryName, Class<T> returnType) {
+        NamedQueryMetadataHolder namedQueryMetadata = context.getNamedQueryMetadata(domainClass, queryName);
+        ResultMapper<T> mapper = context.getMapper(returnType);
         try {
-            return new QueryImpl(connection.prepareStatement(sqlQuery));
+            PreparedStatement preparedStatement = connection.prepareStatement(namedQueryMetadata.getQuery());
+            return new NamedQueryImpl<>(preparedStatement, mapper);
         } catch (SQLException e) {
             throw new PhoenixException("Cannot create query", e);
         }

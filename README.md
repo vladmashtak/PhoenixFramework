@@ -1,4 +1,5 @@
 # PhoenixFramework
+![](https://github.com/MarchenkoProjects/PhoenixFramework/raw/master/raw/image/phoenix-logo.png)
 **Phoenix** is a Java framework which represents a simple and transparent way to work with database. 
 The main concept of the framework is mapping data from a query to data object (Pattern [DTO](https://en.wikipedia.org/wiki/Data_transfer_object)) 
 which is a simple [POJO](https://en.wikipedia.org/wiki/Plain_old_Java_object). At the moment, the main active object is the **SessionFactory**.

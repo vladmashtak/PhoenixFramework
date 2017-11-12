@@ -15,12 +15,12 @@ public final class ClassUtils {
     private static final char PATH_SEPARATOR = '/';
     private static final String CLASS_EXTENSION = ".class";
 
-    public static List<Class<?>> loadClassesFromPackage(String packageToScan) {
+    public static List<Class<?>> deepScanningClassesFromPackage(String packageToScan) {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         String packagePath = resolveBasePackage(packageToScan);
         URL resource = loader.getResource(packagePath);
         if (resource == null) {
-            throw new IllegalStateException("Cannot get resource by path \"" + packagePath + "\"");
+            return Collections.emptyList();
         }
 
         File classesDirectory = new File(resource.getPath());
@@ -35,6 +35,9 @@ public final class ClassUtils {
                 String classPath = packageToScan + PACKAGE_SEPARATOR +
                         className.substring(0, className.indexOf(PACKAGE_SEPARATOR));
                 classes.add(loadClass(classPath));
+            } else {
+                String innerPackage = packageToScan + PACKAGE_SEPARATOR + className;
+                classes.addAll(deepScanningClassesFromPackage(innerPackage));
             }
         }
         return classes;

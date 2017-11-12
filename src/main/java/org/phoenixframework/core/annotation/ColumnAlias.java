@@ -6,14 +6,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation allows to define a set of named queries for a specified domain class.
+ * Annotation allows to specify a column name if it does not match the field name.
  *
  * @author Oleg Marchenko
  */
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface NamedQueries {
+@Target(ElementType.FIELD)
+public @interface ColumnAlias {
 
-    NamedQuery[] value() default {};
+    String value();
 }

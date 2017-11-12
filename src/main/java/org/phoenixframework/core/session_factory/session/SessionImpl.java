@@ -1,9 +1,9 @@
 package org.phoenixframework.core.session_factory.session;
 
-import org.phoenixframework.core.context.PhoenixContext;
-import org.phoenixframework.core.context.registry.metadata.NamedQueryMetadataHolder;
+import org.phoenixframework.core.context.registry.descriptor.DomainDescriptor;
 import org.phoenixframework.core.exception.PhoenixException;
 import org.phoenixframework.core.mapper.ResultMapper;
+import org.phoenixframework.core.session_factory.SessionFactory;
 import org.phoenixframework.core.session_factory.session.query.NamedQuery;
 import org.phoenixframework.core.session_factory.session.query.NamedQueryImpl;
 import org.phoenixframework.core.session_factory.session.query.Query;
@@ -21,15 +21,9 @@ import java.sql.SQLException;
 public class SessionImpl implements Session {
 
     private final Connection connection;
-    private final PhoenixContext context;
 
     public SessionImpl(Connection connection) {
-        this(connection, null);
-    }
-
-    public SessionImpl(Connection connection, PhoenixContext context) {
         this.connection = connection;
-        this.context = context;
     }
 
     @Override
@@ -50,15 +44,24 @@ public class SessionImpl implements Session {
 
     @Override
     public <T> NamedQuery<T> createNamedQuery(Class<T> domainClass, String queryName) {
-        return createNamedQuery(domainClass, queryName, domainClass);
+        DomainDescriptor domainDescriptor = SessionFactory.context().getDomain(domainClass);
+        String query = domainDescriptor.getNamedQuery(queryName);
+        ResultMapper<T> domainMapper = domainDescriptor.getDomainMapper();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            return new NamedQueryImpl<>(preparedStatement, domainMapper);
+        } catch (SQLException e) {
+            throw new PhoenixException("Cannot create query", e);
+        }
     }
 
     @Override
     public <T> NamedQuery<T> createNamedQuery(Class<?> domainClass, String queryName, Class<T> returnType) {
-        NamedQueryMetadataHolder namedQueryMetadata = context.getNamedQueryMetadata(domainClass, queryName);
-        ResultMapper<T> mapper = context.getMapper(returnType);
+        DomainDescriptor domainDescriptor = SessionFactory.context().getDomain(domainClass);
+        String query = domainDescriptor.getNamedQuery(queryName);
+        ResultMapper<T> mapper = SessionFactory.context().getStandardMapper(returnType);
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(namedQueryMetadata.getQuery());
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
             return new NamedQueryImpl<>(preparedStatement, mapper);
         } catch (SQLException e) {
             throw new PhoenixException("Cannot create query", e);

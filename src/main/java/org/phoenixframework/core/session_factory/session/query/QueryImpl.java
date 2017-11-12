@@ -8,6 +8,8 @@ import java.sql.*;
 import java.util.Collection;
 
 /**
+ * {@inheritDoc}
+ *
  * @author Oleg Marchenko
  * @see org.phoenixframework.core.session_factory.session.query.Query
  */
@@ -87,7 +89,7 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public Query setBoolean(int paramIndex, boolean value) {
+    public Query setParameter(int paramIndex, boolean value) {
         try {
             preparedStatement.setBoolean(paramIndex, value);
         } catch (SQLException e) {
@@ -97,7 +99,7 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public Query setByte(int paramIndex, byte value) {
+    public Query setParameter(int paramIndex, byte value) {
         try {
             preparedStatement.setByte(paramIndex, value);
         } catch (SQLException e) {
@@ -107,7 +109,7 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public Query setShort(int paramIndex, short value) {
+    public Query setParameter(int paramIndex, short value) {
         try {
             preparedStatement.setShort(paramIndex, value);
         } catch (SQLException e) {
@@ -117,7 +119,7 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public Query setInt(int paramIndex, int value) {
+    public Query setParameter(int paramIndex, int value) {
         try {
             preparedStatement.setInt(paramIndex, value);
         } catch (SQLException e) {
@@ -127,7 +129,7 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public Query setLong(int paramIndex, long value) {
+    public Query setParameter(int paramIndex, long value) {
         try {
             preparedStatement.setLong(paramIndex, value);
         } catch (SQLException e) {
@@ -137,7 +139,7 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public Query setFloat(int paramIndex, float value) {
+    public Query setParameter(int paramIndex, float value) {
         try {
             preparedStatement.setFloat(paramIndex, value);
         } catch (SQLException e) {
@@ -147,7 +149,7 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public Query setDouble(int paramIndex, double value) {
+    public Query setParameter(int paramIndex, double value) {
         try {
             preparedStatement.setDouble(paramIndex, value);
         } catch (SQLException e) {
@@ -157,7 +159,7 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public Query setBigDecimal(int paramIndex, BigDecimal value) {
+    public Query setParameter(int paramIndex, BigDecimal value) {
         try {
             preparedStatement.setBigDecimal(paramIndex, value);
         } catch (SQLException e) {
@@ -167,7 +169,7 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public Query setString(int paramIndex, String value) {
+    public Query setParameter(int paramIndex, String value) {
         try {
             preparedStatement.setString(paramIndex, value);
         } catch (SQLException e) {
@@ -177,7 +179,7 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public Query setBytes(int paramIndex, byte[] value) {
+    public Query setParameter(int paramIndex, byte[] value) {
         try {
             preparedStatement.setBytes(paramIndex, value);
         } catch (SQLException e) {
@@ -187,7 +189,7 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public Query setDate(int paramIndex, Date value) {
+    public Query setParameter(int paramIndex, Date value) {
         try {
             preparedStatement.setDate(paramIndex, value);
         } catch (SQLException e) {
@@ -197,7 +199,7 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public Query setTime(int paramIndex, Time value) {
+    public Query setParameter(int paramIndex, Time value) {
         try {
             preparedStatement.setTime(paramIndex, value);
         } catch (SQLException e) {
@@ -207,7 +209,7 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public Query setTimestamp(int paramIndex, Timestamp value) {
+    public Query setParameter(int paramIndex, Timestamp value) {
         try {
             preparedStatement.setTimestamp(paramIndex, value);
         } catch (SQLException e) {
@@ -217,7 +219,7 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public Query setObject(int paramIndex, Object value) {
+    public Query setParameter(int paramIndex, Object value) {
         try {
             preparedStatement.setObject(paramIndex, value);
         } catch (SQLException e) {
@@ -227,9 +229,9 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public Query setParameters(Object... parameterValues) {
-        for (int i = 0; i < parameterValues.length; i++) {
-            setObject(i + 1, parameterValues[i]);
+    public Query setParameters(Object... parameters) {
+        for (int i = 0; i < parameters.length; i++) {
+            setParameter(i + 1, parameters[i]);
         }
         return this;
     }

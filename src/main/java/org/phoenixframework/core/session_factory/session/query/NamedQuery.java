@@ -8,6 +8,10 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * The <code>NamedQuery</code> represents a parametrized query for specific type or domain class.
+ *
+ * @param <T> the specific type or domain class
+ *
  * @author Oleg Marchenko
  * @see org.phoenixframework.core.session_factory.session.query.Query
  */
@@ -32,91 +36,91 @@ public interface NamedQuery<T> extends Query {
      * {@inheritDoc}
      */
     @Override
-    NamedQuery<T> setBoolean(int paramIndex, boolean value);
+    NamedQuery<T> setParameter(int paramIndex, boolean value);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    NamedQuery<T> setByte(int paramIndex, byte value);
+    NamedQuery<T> setParameter(int paramIndex, byte value);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    NamedQuery<T> setShort(int paramIndex, short value);
+    NamedQuery<T> setParameter(int paramIndex, short value);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    NamedQuery<T> setInt(int paramIndex, int value);
+    NamedQuery<T> setParameter(int paramIndex, int value);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    NamedQuery<T> setLong(int paramIndex, long value);
+    NamedQuery<T> setParameter(int paramIndex, long value);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    NamedQuery<T> setFloat(int paramIndex, float value);
+    NamedQuery<T> setParameter(int paramIndex, float value);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    NamedQuery<T> setDouble(int paramIndex, double value);
+    NamedQuery<T> setParameter(int paramIndex, double value);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    NamedQuery<T> setBigDecimal(int paramIndex, BigDecimal value);
+    NamedQuery<T> setParameter(int paramIndex, BigDecimal value);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    NamedQuery<T> setString(int paramIndex, String value);
+    NamedQuery<T> setParameter(int paramIndex, String value);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    NamedQuery<T> setBytes(int paramIndex, byte[] value);
+    NamedQuery<T> setParameter(int paramIndex, byte[] value);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    NamedQuery<T> setDate(int paramIndex, Date value);
+    NamedQuery<T> setParameter(int paramIndex, Date value);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    NamedQuery<T> setTime(int paramIndex, Time value);
+    NamedQuery<T> setParameter(int paramIndex, Time value);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    NamedQuery<T> setTimestamp(int paramIndex, Timestamp value);
+    NamedQuery<T> setParameter(int paramIndex, Timestamp value);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    NamedQuery<T> setObject(int paramIndex, Object value);
+    NamedQuery<T> setParameter(int paramIndex, Object value);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    NamedQuery<T> setParameters(Object... parameterValues);
+    NamedQuery<T> setParameters(Object... parameters);
 
     /**
      * {@inheritDoc}

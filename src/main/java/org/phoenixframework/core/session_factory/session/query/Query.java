@@ -62,7 +62,7 @@ public interface Query {
      * @param value the parameter value
      * @return instance of this query
      */
-    Query setBoolean(int paramIndex, boolean value);
+    Query setParameter(int paramIndex, boolean value);
 
     /**
      * Sets the designated parameter to the given Java <code>byte</code> value.
@@ -71,7 +71,7 @@ public interface Query {
      * @param value the parameter value
      * @return instance of this query
      */
-    Query setByte(int paramIndex, byte value);
+    Query setParameter(int paramIndex, byte value);
 
     /**
      * Sets the designated parameter to the given Java <code>short</code> value.
@@ -80,7 +80,7 @@ public interface Query {
      * @param value the parameter value
      * @return instance of this query
      */
-    Query setShort(int paramIndex, short value);
+    Query setParameter(int paramIndex, short value);
 
     /**
      * Sets the designated parameter to the given Java <code>int</code> value.
@@ -89,7 +89,7 @@ public interface Query {
      * @param value the parameter value
      * @return instance of this query
      */
-    Query setInt(int paramIndex, int value);
+    Query setParameter(int paramIndex, int value);
 
     /**
      * Sets the designated parameter to the given Java <code>long</code> value.
@@ -98,7 +98,7 @@ public interface Query {
      * @param value the parameter value
      * @return instance of this query
      */
-    Query setLong(int paramIndex, long value);
+    Query setParameter(int paramIndex, long value);
 
     /**
      * Sets the designated parameter to the given Java <code>float</code> value.
@@ -107,7 +107,7 @@ public interface Query {
      * @param value the parameter value
      * @return instance of this query
      */
-    Query setFloat(int paramIndex, float value);
+    Query setParameter(int paramIndex, float value);
 
     /**
      * Sets the designated parameter to the given Java <code>double</code> value.
@@ -116,7 +116,7 @@ public interface Query {
      * @param value the parameter value
      * @return instance of this query
      */
-    Query setDouble(int paramIndex, double value);
+    Query setParameter(int paramIndex, double value);
 
     /**
      * Sets the designated parameter to the given Java <code>java.math.BigDecimal</code> value.
@@ -125,7 +125,7 @@ public interface Query {
      * @param value the parameter value
      * @return instance of this query
      */
-    Query setBigDecimal(int paramIndex, BigDecimal value);
+    Query setParameter(int paramIndex, BigDecimal value);
 
     /**
      * Sets the designated parameter to the given Java <code>String</code> value.
@@ -134,7 +134,7 @@ public interface Query {
      * @param value the parameter value
      * @return instance of this query
      */
-    Query setString(int paramIndex, String value);
+    Query setParameter(int paramIndex, String value);
 
     /**
      * Sets the designated parameter to the given Java array of bytes.
@@ -143,7 +143,7 @@ public interface Query {
      * @param value the parameter value
      * @return instance of this query
      */
-    Query setBytes(int paramIndex, byte value[]);
+    Query setParameter(int paramIndex, byte[] value);
 
     /**
      * Sets the designated parameter to the given Java <code>java.sql.Date</code> value.
@@ -152,7 +152,7 @@ public interface Query {
      * @param value the parameter value
      * @return instance of this query
      */
-    Query setDate(int paramIndex, Date value);
+    Query setParameter(int paramIndex, Date value);
 
     /**
      * Sets the designated parameter to the given Java <code>java.sql.Time</code> value.
@@ -161,7 +161,7 @@ public interface Query {
      * @param value the parameter value
      * @return instance of this query
      */
-    Query setTime(int paramIndex, Time value);
+    Query setParameter(int paramIndex, Time value);
 
     /**
      * Sets the designated parameter to the given Java <code>java.sql.Timestamp</code> value.
@@ -170,7 +170,7 @@ public interface Query {
      * @param value the parameter value
      * @return instance of this query
      */
-    Query setTimestamp(int paramIndex, Timestamp value);
+    Query setParameter(int paramIndex, Timestamp value);
 
     /**
      * Sets the value of the designated parameter with the given object.
@@ -179,15 +179,15 @@ public interface Query {
      * @param value the parameter value
      * @return instance of this query
      */
-    Query setObject(int paramIndex, Object value);
+    Query setParameter(int paramIndex, Object value);
 
     /**
      * Sets the values of the designated parameter with the given object.
      *
-     * @param parameterValues the parameter values
+     * @param parameters the parameter values
      * @return instance of this query
      */
-    Query setParameters(Object... parameterValues);
+    Query setParameters(Object... parameters);
 
     /**
      * Sets the collection of values of the designated parameter with the given object.

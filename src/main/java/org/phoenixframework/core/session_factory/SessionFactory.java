@@ -26,8 +26,15 @@ public final class SessionFactory {
         return FACTORY_INSTANCE;
     }
 
+    private static class PhoenixContextHolder {
+        public static final PhoenixContext CONTEXT_INSTANCE = new PhoenixContext();
+    }
+
+    public static PhoenixContext context() {
+        return PhoenixContextHolder.CONTEXT_INSTANCE;
+    }
+
     private DataSource dataSource;
-    private PhoenixContext context;
 
     private SessionFactory() {
     }
@@ -39,14 +46,6 @@ public final class SessionFactory {
      */
     public void registerDataSource(DataSourceSupplier supplier) {
         this.dataSource = supplier.getDataSource();
-    }
-
-    public PhoenixContext getContext() {
-        return context;
-    }
-
-    public void registerContext(PhoenixContext context) {
-        this.context = context;
     }
 
     /**
@@ -73,6 +72,6 @@ public final class SessionFactory {
      * @return a new session with custom connection
      */
     public Session openSession(Connection connection) {
-        return new SessionImpl(connection, context);
+        return new SessionImpl(connection);
     }
 }

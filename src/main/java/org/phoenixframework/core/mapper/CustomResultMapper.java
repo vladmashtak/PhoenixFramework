@@ -2,7 +2,6 @@ package org.phoenixframework.core.mapper;
 
 import org.phoenixframework.core.session_factory.session.query.scrollable_result.CachedScrollableResult;
 import org.phoenixframework.core.session_factory.session.query.scrollable_result.ReadOnlyScrollableResult;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,12 +16,10 @@ import java.util.Map;
  *
  * @author Oleg Marchenko
  * @see org.phoenixframework.core.mapper.ResultMapper
- * @see org.phoenixframework.core.mapper.InternalObjectTransformer
- * @see org.phoenixframework.core.session_factory.session.query.scrollable_result.ReadOnlyScrollableResult
- * @see org.phoenixframework.core.session_factory.session.query.scrollable_result.CachedScrollableResult
+ * @see org.phoenixframework.core.mapper.DataTransformer
  */
 
-public abstract class CustomResultMapper<T> extends InternalObjectTransformer implements ResultMapper<T> {
+public abstract class CustomResultMapper<T> implements ResultMapper<T>, DataTransformer {
 
     @Override
     public T unique(CachedScrollableResult scrollableResult) {
@@ -51,7 +48,7 @@ public abstract class CustomResultMapper<T> extends InternalObjectTransformer im
 
     @Override
     public Map<String, Object> toNamedValues(Object object) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Method not implemented");
     }
 
     /**

@@ -4,28 +4,31 @@
 
     <groupId>org.phoenixframework.phoenix-core</groupId>
     <artifactId>phoenix-core</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Phoenix Framework</name>
+    <description>
+        Phoenix is a simple and transparent way to work with database.
+        It represents the technology for mapping data from a query to a domain object.
+    </description>
 
     <developers>
         <developer>
             <id>omarchenko</id>
             <name>Oleg Marchenko</name>
-            <email>omarchenko.150@gmail.com</email>
+            <email>omarchenko.150(at)gmail.com</email>
             <roles>
-                <role>owner</role>
                 <role>architect</role>
                 <role>developer</role>
             </roles>
-            <timezone>+3</timezone>
+            <timezone>+2</timezone>
         </developer>
     </developers>
 
     <properties>
+        <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
 
         <junit.version>4.12</junit.version>
     </properties>
@@ -40,11 +43,12 @@
     </dependencies>
 
     <build>
+        <finalName>${artifactId}-${version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
+                <version>3.7.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>

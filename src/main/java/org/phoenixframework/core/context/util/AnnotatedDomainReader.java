@@ -1,10 +1,15 @@
 package org.phoenixframework.core.context.util;
 
 import org.phoenixframework.core.annotation.*;
-import org.phoenixframework.core.context.registry.DomainMetadataRegistry;
-import org.phoenixframework.core.context.registry.metadata.DomainMetadataHolder;
-import org.phoenixframework.core.context.registry.metadata.FieldMetadataHolder;
-import org.phoenixframework.core.context.registry.metadata.NamedQueryMetadataHolder;
+import org.phoenixframework.core.context.registry.DomainDescriptorRegistry;
+import org.phoenixframework.core.context.registry.descriptor.DomainDescriptor;
+import org.phoenixframework.core.context.registry.descriptor.FieldDescriptor;
+import org.phoenixframework.core.context.registry.extractor.ValueExtractor;
+import org.phoenixframework.core.context.registry.extractor.WrappedValueExtractor;
+import org.phoenixframework.core.context.registry.holder.FieldHolder;
+import org.phoenixframework.core.mapper.CustomResultMapper;
+import org.phoenixframework.core.mapper.DataTransformer;
+import org.phoenixframework.core.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 
@@ -14,9 +19,9 @@ import java.lang.reflect.Field;
 
 public final class AnnotatedDomainReader {
 
-    private final DomainMetadataRegistry registry;
+    private final DomainDescriptorRegistry registry;
 
-    public AnnotatedDomainReader(DomainMetadataRegistry registry) {
+    public AnnotatedDomainReader(DomainDescriptorRegistry registry) {
         this.registry = registry;
     }
 
@@ -28,24 +33,25 @@ public final class AnnotatedDomainReader {
 
     protected void doRegister(Class<?> candidateClass) {
         if (!registry.isRegistered(candidateClass) && candidateClass.isAnnotationPresent(Domain.class)) {
-            DomainMetadataHolder domainMetadataHolder = new DomainMetadataHolder(candidateClass);
-
             Class<?> candidateSuperclass = candidateClass.getSuperclass();
             if (!Object.class.equals(candidateSuperclass)) {
                 doRegister(candidateSuperclass);
             }
 
+            DomainDescriptor domainDescriptor;
+            CustomMapper customMapper = candidateClass.getAnnotation(CustomMapper.class);
+            if (customMapper == null) {
+                domainDescriptor = new DomainDescriptor(candidateClass);
+            } else {
+                Class<? extends CustomResultMapper<?>> customMapperClass = customMapper.value();
+                DataTransformer domainTransformer = ReflectionUtils.newInstance(customMapperClass);
+                domainDescriptor = new DomainDescriptor(candidateClass, domainTransformer);
+            }
+
             NamedQueries namedQueries = candidateClass.getAnnotation(NamedQueries.class);
             if (namedQueries != null) {
                 for (NamedQuery namedQuery: namedQueries.value()) {
-                    Class<?> returnType = namedQuery.returnType();
-                    if (Object.class.equals(returnType)) {
-                        returnType = candidateClass;
-                    }
-
-                    NamedQueryMetadataHolder namedQueryMetadataHolder =
-                            new NamedQueryMetadataHolder(namedQuery.name(), namedQuery.query(), returnType);
-                    domainMetadataHolder.addNamedQueryMetadata(namedQueryMetadataHolder);
+                    domainDescriptor.registerNamedQuery(namedQuery.name(), namedQuery.query());
                 }
             }
 
@@ -53,23 +59,26 @@ public final class AnnotatedDomainReader {
             for (Field field: fields) {
                 if (!field.isAnnotationPresent(Transient.class)) {
                     String columnName = field.getName();
-                    FromColumn fromColumn = field.getAnnotation(FromColumn.class);
-                    if (fromColumn != null) {
-                        columnName = fromColumn.value();
+                    ColumnAlias columnAlias = field.getAnnotation(ColumnAlias.class);
+                    if (columnAlias != null) {
+                        columnName = columnAlias.value();
                     }
 
-                    FieldMetadataHolder fieldMetadataHolder;
+                    ValueExtractor valueExtractor;
                     if (!field.isAnnotationPresent(Wrapper.class)) {
-                        fieldMetadataHolder = new FieldMetadataHolder(field, columnName);
+                        valueExtractor = new ValueExtractor();
                     } else {
                         doRegister(field.getType());
 
-                        fieldMetadataHolder = new FieldMetadataHolder(field, columnName, true);
+                        DomainDescriptor registeredDomainDescriptor = registry.getDescriptor(field.getType());
+                        valueExtractor = new WrappedValueExtractor(registeredDomainDescriptor.getDomainTransformer());
                     }
-                    domainMetadataHolder.addFieldMetadata(fieldMetadataHolder);
+
+                    FieldDescriptor fieldDescriptor = new FieldDescriptor(new FieldHolder(field), columnName, valueExtractor);
+                    domainDescriptor.registerFieldDescriptor(fieldDescriptor);
                 }
             }
-            registry.registerMetadata(domainMetadataHolder);
+            registry.registerDescriptor(domainDescriptor);
         }
     }
 }

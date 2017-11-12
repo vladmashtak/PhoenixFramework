@@ -1,5 +1,6 @@
 # PhoenixFramework
 ![](https://github.com/MarchenkoProjects/PhoenixFramework/raw/master/raw/image/phoenix-logo.png)
+
 **Phoenix** is a Java framework which represents a simple and transparent way to work with database. 
 The main concept of the framework is mapping data from a query to data object (Pattern [DTO](https://en.wikipedia.org/wiki/Data_transfer_object)) 
 which is a simple [POJO](https://en.wikipedia.org/wiki/Plain_old_Java_object). At the moment, the main active object is the **SessionFactory**.
@@ -8,8 +9,7 @@ which is a simple [POJO](https://en.wikipedia.org/wiki/Plain_old_Java_object). A
 **SessionFactory** represents the basic mechanism for getting a **Session** object. To work correctly 
 you must register and configure [DataSource](https://docs.oracle.com/javase/7/docs/api/javax/sql/DataSource.html).
 ```java
-SessionFactory sessionFactory = SessionFactory.instance();
-sessionFactory.registerDataSource(new DataSourceSupplier() {
+SessionFactory.instance().registerDataSource(new DataSourceSupplier() {
     @Override
     public DataSource getDataSource() {
         DataSource dataSource = ...;
@@ -18,6 +18,7 @@ sessionFactory.registerDataSource(new DataSourceSupplier() {
     }
 });
 ```
+For use full power of framework you need to configure **PhoenixContext**.
 
 ## Concept of Session ##
 **Session** represents the physical connection between Java application and database. Session is a lightweight object, so it is always 
@@ -99,7 +100,7 @@ Create domain object:
 })
 public class Movie {
     private int id;
-    @FromColumn("original_name")
+    @ColumnAlias("original_name")
     private String originalName;
     private int year;
     private double rating;
@@ -111,14 +112,10 @@ Annotation ```@Domain``` allows to mark a class as domain object.
 
 Annotations ```@NamedQueries``` and ```@NamedQuery``` allows to define a set of named queries for this domain class.
 
-Annotation ```@FromColumn``` allows to specify a column name if it does not match the field name.
+Annotation ```@ColumnAlias``` allows to specify a column name if it does not match the field name.
 
 ```java
-PhoenixContext context = new PhoenixContext();
-context.register(Movie.class);
-context.registerTransformer(Movie.class, new AliasResultMapper<>(context, Movie.class));
-
-SessionFactory.instance().registerContext(context);
+SessionFactory.context().register(Movie.class);
 
 try (Session session = SessionFactory.instance().openSession()) {
     Movie movie = session
